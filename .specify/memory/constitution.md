@@ -1,50 +1,41 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# AI Avatar PoC Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Specification-First Development
+すべての開発は仕様駆動で進める。実装前に、目的、対象範囲、非対象範囲、成功条件を明文化する。仕様が曖昧な状態では実装を開始しない。
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. No Assumption-Driven Features
+推測で機能を追加しない。要件にない機能追加や拡張は、仕様の更新と合意を経てから行う。
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. PoC Prioritization: Minimum Working System
+初期 PoC では「最小構成で動くこと」を最優先とする。完成度よりも、検証可能なエンドツーエンド動作を重視する。
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Dify-Centered Intelligence Architecture
+Dify を AI の頭脳として扱う。キャラクター設定、応答方針、表情タグ出力ルールは Dify 側に集約し、フロントエンド側へロジックを分散させない。
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Frontend Responsibility Separation
+フロントエンドは UI 表示、Dify API 呼び出し、表情制御、音声再生に専念する。将来拡張に備え、音声認識、外部 TTS、Live2D、Realtime API は分離可能な構成で設計する。
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Scope and Technical Constraints
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- 本 PoC の会話入力対象はテキスト入力を第一対象とする。
+- 音声認識と Live2D は後続フェーズで検討する。
+- 機密情報（API キー等）は `.env` で管理し、Git 管理対象に含めない。
+- 作業環境は Windows または Mac を前提とする。
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Documentation and Workflow Requirements
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+- README に最低限以下を記載する。
+- 起動手順
+- 必要な環境変数
+- Dify 側の設定方針（キャラクター設定、応答方針、表情タグ方針）
+- 実装は拡張容易性を担保するため、入力、応答生成、表情制御、音声処理を責務分離して構成する。
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+- 本 Constitution は本プロジェクトの開発判断における最上位規約とし、他文書と矛盾する場合は本 Constitution を優先する。
+- 仕様・実装・レビューでは本 Constitution への適合確認を必須とする。
+- 変更は変更理由、影響範囲、移行方針を明記したうえで合意し、文書を更新する。
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-05-18 | **Last Amended**: 2026-05-18
