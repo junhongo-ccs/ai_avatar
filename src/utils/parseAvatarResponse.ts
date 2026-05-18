@@ -13,17 +13,24 @@ const asFace = (face: string | undefined) => {
   return 'normal'
 }
 
-export const parseAvatarResponse = (raw: string): AvatarResponse => {
+type ParseOptions = {
+  source?: AvatarResponse['source']
+  fallbackText?: string
+}
+
+export const parseAvatarResponse = (raw: string, options?: ParseOptions): AvatarResponse => {
   const trimmed = raw.trim()
+  const source = options?.source ?? 'mock'
+  const fallbackText = options?.fallbackText ?? '応答を解釈できませんでした。'
 
   try {
     const parsed = JSON.parse(trimmed) as RawAvatarJson
     if (typeof parsed.text === 'string') {
       return {
         face: asFace(parsed.face),
-        text: parsed.text.trim(),
+        text: parsed.text.trim() || fallbackText,
         raw,
-        source: 'mock',
+        source,
       }
     }
   } catch {
@@ -33,8 +40,8 @@ export const parseAvatarResponse = (raw: string): AvatarResponse => {
   const fromTag = extractFaceTag(trimmed)
   return {
     face: fromTag.face,
-    text: fromTag.text,
+    text: fromTag.text.trim() || fallbackText,
     raw,
-    source: 'mock',
+    source,
   }
 }
