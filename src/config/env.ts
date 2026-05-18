@@ -1,4 +1,4 @@
-import type { DifyConfig, DifyConnectionStatus } from '../types/config'
+import type { DifyConfig, DifyConnectionStatus, TtsProvider } from '../types/config'
 
 const normalizeBool = (value: string | undefined) => value?.toLowerCase() === 'true'
 
@@ -14,6 +14,11 @@ export const getDifyConfigFrom = (env: EnvLike): DifyConfig => {
 }
 
 export const getDifyConfig = (): DifyConfig => getDifyConfigFrom(import.meta.env)
+
+export const getTtsProviderFrom = (env: EnvLike): TtsProvider =>
+  env.VITE_TTS_PROVIDER === 'voicevox' ? 'voicevox' : 'browser'
+
+export const getTtsProvider = (): TtsProvider => getTtsProviderFrom(import.meta.env)
 
 export const getDifyConnectionStatus = (config: DifyConfig): DifyConnectionStatus => {
   if (config.useMock) {

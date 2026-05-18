@@ -19,6 +19,7 @@ vi.mock('../../config/env', () => ({
     useMock: envState.mode === 'mock',
   }),
   getDifyConnectionStatus: () => envState.mode,
+  getTtsProvider: () => 'browser',
 }))
 
 vi.mock('../../services/mockService', () => ({

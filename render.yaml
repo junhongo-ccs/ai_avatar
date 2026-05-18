@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: ai-avatar-poc
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: VITE_TTS_PROVIDER
+        value: browser
+      - key: VITE_USE_MOCK
+        value: "false"
+      - key: VITE_DIFY_API_URL
+        sync: false
+      - key: VITE_DIFY_API_KEY
+        sync: false
+      - key: VITE_DIFY_USER_ID
+        sync: false

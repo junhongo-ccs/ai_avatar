@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import { adaptDifyResponse } from '../../adapters/difyResponseAdapter'
-import { getDifyConfig, getDifyConnectionStatus } from '../../config/env'
+import { getDifyConfig, getDifyConnectionStatus, getTtsProvider } from '../../config/env'
 import { sendMessageToDify } from '../../services/difyClient'
 import { sendMessage, sendNextFaceSample } from '../../services/mockService'
 import { speakText } from '../../services/speechService'
@@ -19,6 +19,7 @@ const initialMessageByConnectionStatus = {
 export const useChatController = () => {
   const config = getDifyConfig()
   const envConnectionStatus = getDifyConnectionStatus(config)
+  const ttsProvider = getTtsProvider()
   const initialMode: AppStatus['mode'] = envConnectionStatus === 'mock' ? 'mock' : 'dify'
 
   const [entries, setEntries] = useState<ChatEntry[]>([
@@ -32,7 +33,9 @@ export const useChatController = () => {
   const [status, setStatus] = useState<AppStatus>({
     mode: initialMode,
     connectionStatus: envConnectionStatus,
+    ttsProvider,
     isLoading: false,
+    isSpeaking: false,
     currentFace: 'normal',
   })
   const [conversationId, setConversationId] = useState<string | undefined>(undefined)
@@ -60,7 +63,17 @@ export const useChatController = () => {
       errorMessage: undefined,
       connectionStatus: prev.mode === 'dify' ? 'connected' : 'mock',
     }))
-    speakText(text)
+    speakText(text, status.ttsProvider, {
+      onStart: () => {
+        setStatus((prev) => ({ ...prev, isSpeaking: true }))
+      },
+      onEnd: () => {
+        setStatus((prev) => ({ ...prev, isSpeaking: false }))
+      },
+      onFallback: (message) => {
+        setStatus((prev) => ({ ...prev, errorMessage: message }))
+      },
+    })
   }
 
   const handleSend = async (text: string) => {
@@ -116,6 +129,7 @@ export const useChatController = () => {
       setStatus((prev) => ({
         ...prev,
         connectionStatus: prev.mode === 'dify' ? 'error' : 'mock',
+        isSpeaking: false,
         errorMessage:
           prev.mode === 'dify'
             ? 'Dify応答の取得に失敗しました。接続情報とアプリ公開状態を確認してください。'
@@ -138,6 +152,7 @@ export const useChatController = () => {
       setLoading(false)
       setStatus((prev) => ({
         ...prev,
+        isSpeaking: false,
         errorMessage: '表情テストに失敗しました。',
       }))
     }

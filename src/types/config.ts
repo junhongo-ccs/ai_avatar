@@ -6,3 +6,4 @@ export type DifyConfig = {
 }
 
 export type DifyConnectionStatus = 'mock' | 'connected' | 'misconfigured'
+export type TtsProvider = 'browser' | 'voicevox'

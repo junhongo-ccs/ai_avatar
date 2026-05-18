@@ -20,7 +20,7 @@ export const App = () => {
       <section className="grid gap-4 md:grid-cols-[18rem_1fr]">
         <div className="space-y-3">
           <StatusBadge status={status} />
-          <AvatarDisplay face={status.currentFace} />
+          <AvatarDisplay face={status.currentFace} isSpeaking={status.isSpeaking} />
           {status.mode === 'mock' ? (
             <button
               type="button"

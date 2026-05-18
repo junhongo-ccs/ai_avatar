@@ -21,7 +21,14 @@ export const ChatLog = ({ entries }: ChatLogProps) => {
             className={`flex ${entry.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div className={`max-w-[85%] ${entry.role === 'user' ? 'items-end' : 'items-start'} flex flex-col`}>
-              <p className="mb-1 text-xs text-slate-500">{entry.role}</p>
+              <p className="mb-1 flex items-center gap-2 text-xs text-slate-500">
+                <span>{entry.role}</span>
+                {entry.face ? (
+                  <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
+                    face: {entry.face}
+                  </span>
+                ) : null}
+              </p>
               <p
                 className={`rounded-2xl px-4 py-2 text-sm leading-relaxed ${
                   entry.role === 'user'
