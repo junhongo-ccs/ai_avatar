@@ -1,8 +1,17 @@
 import { useEffect, useRef } from 'react'
+import type { Face } from '../types/avatar'
 import type { ChatEntry } from '../types/chat'
 
 type ChatLogProps = {
   entries: ChatEntry[]
+}
+
+const FACE_LABELS: Record<Face, string> = {
+  normal: 'normal',
+  joy: 'joy',
+  sad: 'sad',
+  angry: 'concerned',
+  surprised: 'surprised',
 }
 
 export const ChatLog = ({ entries }: ChatLogProps) => {
@@ -25,7 +34,7 @@ export const ChatLog = ({ entries }: ChatLogProps) => {
                 <span>{entry.role}</span>
                 {entry.face ? (
                   <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
-                    face: {entry.face}
+                    face: {FACE_LABELS[entry.face]}
                   </span>
                 ) : null}
               </p>

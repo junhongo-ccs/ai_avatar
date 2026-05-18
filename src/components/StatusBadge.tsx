@@ -1,7 +1,16 @@
 import type { AppStatus } from '../types/status'
+import type { Face } from '../types/avatar'
 
 type StatusBadgeProps = {
   status: AppStatus
+}
+
+const FACE_LABELS: Record<Face, string> = {
+  normal: 'normal',
+  joy: 'joy',
+  sad: 'sad',
+  angry: 'concerned',
+  surprised: 'surprised',
 }
 
 export const StatusBadge = ({ status }: StatusBadgeProps) => {
@@ -24,7 +33,7 @@ export const StatusBadge = ({ status }: StatusBadgeProps) => {
         status: {status.connectionStatus}
       </span>
       <span className="rounded bg-white px-2 py-0.5 text-xs font-medium text-slate-700">
-        face: {status.currentFace}
+        face: {FACE_LABELS[status.currentFace]}
       </span>
       <span className="rounded bg-white px-2 py-0.5 text-xs font-medium text-slate-700">
         speaking: {status.isSpeaking ? 'on' : 'off'}
