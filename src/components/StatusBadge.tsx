@@ -15,9 +15,11 @@ export const StatusBadge = ({ status }: StatusBadgeProps) => {
         : 'border-emerald-200 bg-emerald-50 text-emerald-800'
 
   return (
-    <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm ${tone}`}>
+    <div
+      className={`flex w-full flex-wrap items-center gap-2 rounded-2xl border px-3 py-2 text-sm ${tone}`}
+    >
       <span className="h-2 w-2 rounded-full bg-current" />
-      mode: {status.mode}
+      <span className="font-semibold">mode: {status.mode}</span>
       <span className="rounded bg-white px-2 py-0.5 text-xs font-medium text-slate-700">
         status: {status.connectionStatus}
       </span>

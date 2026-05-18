@@ -93,6 +93,13 @@ npm run dev
 - Render上のbackendからローカル `127.0.0.1:50021` は参照できないため、VOICEVOXはRender初期対象外です。
 - VOICEVOX連携はローカル開発時のみ有効化してください。
 
+### Render公開版の動作確認結果
+
+- Render URL上で `mode: dify` / `status: connected` を確認
+- Dify応答の `face + text` 正規化、表情切替、会話継続（`conversation_id`）を確認
+- Render公開版では `tts: browser` で読み上げ動作を確認
+- VOICEVOXはRender公開版では使用せず、ローカル開発時のみ対象
+
 ## VOICEVOX Notes
 
 - frontendはVOICEVOX Engineを直接呼びません。`/api/tts/voicevox` のみ呼びます。
@@ -128,10 +135,17 @@ npm run dev
 
 対応表情: `normal`, `joy`, `sad`, `angry`, `surprised`
 
+## Real-time Information Limitation
+
+- 現状PoCは、Difyプロンプト中心の応答であり、外部のリアルタイムデータソースを直接参照しません。
+- そのため、最新ニュース・天気・市況などは正確に回答できない場合があります。
+- 今後の拡張で、外部API連携やRAGを組み合わせることで対応可能です。
+
 ## Documents
 
 - `docs/architecture.md`
 - `docs/dify-setup.md`
+- `docs/demo-script.md`
 - `specs/001-dify-poc/p2-preflight-checklist.md`
 
 ## Test & Build

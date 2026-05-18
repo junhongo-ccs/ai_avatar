@@ -9,7 +9,7 @@ export const App = () => {
   const { entries, status, latestError, handleSend, handleNextFace, conversationId } = useChatController()
 
   return (
-    <main className="mx-auto min-h-screen max-w-6xl p-6">
+    <main className="mx-auto min-h-screen w-full max-w-7xl p-4 md:p-6">
       <header className="mb-4">
         <h1 className="text-2xl font-bold text-slate-900">AI Avatar PoC</h1>
         {status.mode === 'dify' && conversationId ? (
@@ -17,8 +17,8 @@ export const App = () => {
         ) : null}
       </header>
 
-      <section className="grid gap-4 md:grid-cols-[18rem_1fr]">
-        <div className="space-y-3">
+      <section className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(280px,320px)_minmax(0,1fr)] lg:items-start">
+        <aside className="space-y-3 lg:sticky lg:top-4">
           <StatusBadge status={status} />
           <AvatarDisplay face={status.currentFace} isSpeaking={status.isSpeaking} />
           {status.mode === 'mock' ? (
@@ -31,16 +31,16 @@ export const App = () => {
               次の表情
             </button>
           ) : null}
-        </div>
+        </aside>
 
-        <div>
+        <section className="min-w-0">
           <ChatLog entries={entries} />
           <div className="mt-2 h-5">
             <LoadingIndicator visible={status.isLoading} mode={status.mode} />
           </div>
           {latestError ? <p className="mt-1 text-sm text-red-700">{latestError}</p> : null}
           <ChatInput disabled={status.isLoading} onSend={handleSend} />
-        </div>
+        </section>
       </section>
     </main>
   )

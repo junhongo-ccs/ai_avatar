@@ -35,6 +35,28 @@ This PoC verifies a conversational AI avatar pipeline:
   - `src/utils/extractFaceTag.ts`
   - `src/utils/parseAvatarResponse.ts`
 
+## Render Public Architecture
+
+Render公開版は以下の構成で動作します:
+
+- Render Web Service (Node)
+  - `dist` を静的配信
+  - `/api/tts/voicevox` エンドポイントを保持（公開版では通常未使用）
+- Dify API
+  - 会話応答を生成
+- Browser SpeechSynthesis
+  - Render公開版のTTS経路
+
+説明図（論理構成）:
+
+`Browser UI -> Render Web Service -> Dify API`
+
+`Browser UI -> Browser SpeechSynthesis (TTS)`
+
+補足:
+- VOICEVOXはローカル開発時の拡張経路です。
+- Render公開版では `VITE_TTS_PROVIDER=browser` を既定とし、VOICEVOX Engineは初期対象外です。
+
 ## Data Boundary Policy
 
 UI layer handles only normalized domain objects:
@@ -61,6 +83,15 @@ Dify raw response is never consumed directly by UI components. Raw payload is ab
 - Next Dify request sends same `conversation_id`
 - This enables continuous multi-turn conversation
 
+## Why real-time answers are limited today
+
+- 現状PoCは、Difyへのテキスト問い合わせを中心とした構成で、外部データソース参照を組み込んでいません。
+- そのため、最新ニュース・天気・価格などリアルタイム情報には正確に回答できない場合があります。
+
+拡張方針:
+- API連携（天気/業務システム）
+- RAG連携（社内ドキュメント検索）
+
 ## Error Handling (P3)
 
 - Prevent double-submit while loading
@@ -71,8 +102,7 @@ Dify raw response is never consumed directly by UI components. Raw payload is ab
 ## Out of Scope
 
 - Live2D animation
-- Speech recognition
-- External TTS providers
+- External TTS providers on Render public runtime
 - Realtime API
 - Authentication and billing
 - Persistent chat history
