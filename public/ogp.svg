@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="AI Avatar PoC OGP">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#075985" />
+    </linearGradient>
+    <linearGradient id="chip" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#22d3ee" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <circle cx="1060" cy="110" r="210" fill="#0ea5e933" />
+  <circle cx="180" cy="560" r="220" fill="#67e8f933" />
+
+  <g transform="translate(92,92)">
+    <rect x="0" y="0" width="165" height="165" rx="36" fill="#e2e8f0" />
+    <circle cx="82" cy="64" r="30" fill="#334155" />
+    <rect x="45" y="106" width="74" height="42" rx="21" fill="#334155" />
+    <circle cx="70" cy="64" r="4" fill="#e2e8f0" />
+    <circle cx="94" cy="64" r="4" fill="#e2e8f0" />
+  </g>
+
+  <g transform="translate(300,122)">
+    <rect x="0" y="0" width="232" height="52" rx="26" fill="url(#chip)" />
+    <text x="116" y="34" text-anchor="middle" fill="#082f49" font-size="28" font-weight="700" font-family="'Segoe UI', 'Noto Sans JP', sans-serif">Dify Connected</text>
+
+    <text x="0" y="124" fill="#f8fafc" font-size="74" font-weight="800" font-family="'Segoe UI', 'Noto Sans JP', sans-serif">AI Avatar PoC</text>
+    <text x="0" y="186" fill="#cbd5e1" font-size="34" font-weight="600" font-family="'Segoe UI', 'Noto Sans JP', sans-serif">会話・表情・音声をつなぐ社内デモ基盤</text>
+
+    <g transform="translate(0,244)">
+      <rect x="0" y="0" width="744" height="180" rx="24" fill="#ffffff14" stroke="#7dd3fc44" />
+      <text x="32" y="58" fill="#e2e8f0" font-size="30" font-weight="600" font-family="'Segoe UI', 'Noto Sans JP', sans-serif">mode: dify  /  status: connected</text>
+      <text x="32" y="108" fill="#bae6fd" font-size="28" font-family="'Segoe UI', 'Noto Sans JP', sans-serif">Dify -> face+text -> Avatar UI -> Browser TTS</text>
+      <text x="32" y="152" fill="#cbd5e1" font-size="24" font-family="'Segoe UI', 'Noto Sans JP', sans-serif">Render public edition (VOICEVOX optional in local dev)</text>
+    </g>
+  </g>
+</svg>
