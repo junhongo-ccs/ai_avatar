@@ -11,7 +11,7 @@ export const App = () => {
   return (
     <main className="mx-auto min-h-screen w-full max-w-7xl p-4 md:p-6">
       <header className="mb-4">
-        <h1 className="text-2xl font-bold text-slate-900">AI Avatar PoC</h1>
+        <h1 className="text-2xl font-bold text-slate-900">AI Avatar | CCS service solutions</h1>
         {status.mode === 'dify' && conversationId ? (
           <p className="mt-1 text-xs text-slate-600">conversation_id: {conversationId}</p>
         ) : null}
