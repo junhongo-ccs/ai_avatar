@@ -39,7 +39,7 @@ describe('ChatInput with speech recognition', () => {
 
     render(<ChatInput onSend={onSend} />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'マイク開始' }))
+    fireEvent.click(screen.getByRole('button', { name: 'マイク入力開始' }))
     RecognitionMock.lastInstance?.onresult?.({ results: [[{ transcript: '音声テキスト' }]] })
 
     await waitFor(() => {
@@ -54,10 +54,10 @@ describe('ChatInput with speech recognition', () => {
 
     render(<ChatInput onSend={onSend} />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'マイク開始' }))
+    fireEvent.click(screen.getByRole('button', { name: 'マイク入力開始' }))
     expect(await screen.findByText('音声入力: 認識中...')).toBeTruthy()
 
-    fireEvent.click(screen.getByRole('button', { name: 'マイク停止' }))
+    fireEvent.click(screen.getByRole('button', { name: 'マイク入力停止' }))
     expect(await screen.findByText('音声入力: 待機中')).toBeTruthy()
   })
 
@@ -68,7 +68,7 @@ describe('ChatInput with speech recognition', () => {
     const onSend = vi.fn().mockResolvedValue(undefined)
     render(<ChatInput onSend={onSend} />)
 
-    const micButton = screen.getByRole('button', { name: 'マイク開始' }) as HTMLButtonElement
+    const micButton = screen.getByRole('button', { name: 'マイク入力開始' }) as HTMLButtonElement
     expect(micButton.disabled).toBe(true)
 
     const input = screen.getByPlaceholderText('メッセージを入力')

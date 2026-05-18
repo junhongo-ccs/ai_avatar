@@ -83,7 +83,7 @@ export const ChatInput = ({ disabled = false, onSend }: ChatInputProps) => {
           disabled={!speechSupported || disabled}
           onClick={toggleListening}
         >
-          {isListening ? 'マイク停止' : 'マイク開始'}
+          {isListening ? 'マイク入力停止' : 'マイク入力開始'}
         </button>
         <button
           className="rounded-xl bg-slate-900 px-4 py-2 text-white disabled:cursor-not-allowed disabled:bg-slate-500"
