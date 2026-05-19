@@ -1,7 +1,7 @@
 # AI Avatar PoC (Dify-Centered)
 
 Difyを頭脳として使うAIアバターPoCです。  
-応答テキストを `face + text` に正規化し、会話ログ・表情切替・音声再生を行います。
+応答テキストを `face + text` に正規化し、会話ログ表示・表情表示・音声再生を行います。
 
 ## Screen Capture
 
@@ -13,6 +13,9 @@ Difyを頭脳として使うAIアバターPoCです。
   - `POST /chat-messages` 呼び出し
   - `answer` を `AvatarResponse` に正規化
   - `conversation_id` 継続
+- ナレッジ活用（運用）
+  - 新卒採用向けナレッジとソリューション系ナレッジをDify側で参照
+  - 未記載事項は断定せず回答する運用を想定
 - ステータス・エラー制御（P3）
   - `connected / misconfigured / error`
   - loading中の二重送信防止、再送復帰
@@ -133,9 +136,8 @@ npm run dev
 
 ## Real-time Information Limitation
 
-- 現状PoCは、Difyプロンプト中心の応答であり、外部のリアルタイムデータソースを直接参照しません。
-- そのため、最新ニュース・天気・市況などは正確に回答できない場合があります。
-- 今後の拡張で、外部API連携やRAGを組み合わせることで対応可能です。
+- 現状PoCは、Dify上で接続したナレッジとプロンプトを中心に応答します。
+- 外部のリアルタイムデータソースを直接参照しない構成のため、最新ニュース・天気・市況などは正確に回答できない場合があります。
 
 ## Documents
 
