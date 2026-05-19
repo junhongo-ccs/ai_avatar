@@ -3,11 +3,9 @@ import { act, renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const envState = {
-  mode: 'mock' as 'mock' | 'connected' | 'misconfigured',
+  mode: 'connected' as 'connected' | 'misconfigured',
 }
 
-const sendMessageMock = vi.fn()
-const sendNextFaceSampleMock = vi.fn()
 const sendMessageToDifyMock = vi.fn()
 const speakTextMock = vi.fn()
 
@@ -16,15 +14,9 @@ vi.mock('../../config/env', () => ({
     apiUrl: 'https://api.dify.ai/v1',
     apiKey: 'dummy',
     userId: 'user-1',
-    useMock: envState.mode === 'mock',
   }),
   getDifyConnectionStatus: () => envState.mode,
   getTtsProvider: () => 'browser',
-}))
-
-vi.mock('../../services/mockService', () => ({
-  sendMessage: (...args: unknown[]) => sendMessageMock(...args),
-  sendNextFaceSample: (...args: unknown[]) => sendNextFaceSampleMock(...args),
 }))
 
 vi.mock('../../services/difyClient', () => ({
@@ -38,36 +30,18 @@ vi.mock('../../services/speechService', () => ({
 import { useChatController } from './useChatController'
 
 beforeEach(() => {
-  sendMessageMock.mockReset()
-  sendNextFaceSampleMock.mockReset()
   sendMessageToDifyMock.mockReset()
   speakTextMock.mockReset()
 })
 
 describe('useChatController', () => {
-  it('mock path works when VITE_USE_MOCK=true', async () => {
-    envState.mode = 'mock'
-    sendMessageMock.mockResolvedValue({ face: 'joy', text: 'mock ok' })
-
-    const { result } = renderHook(() => useChatController())
-
-    await act(async () => {
-      await result.current.handleSend('hello')
-    })
-
-    expect(sendMessageMock).toHaveBeenCalledTimes(1)
-    expect(sendMessageToDifyMock).not.toHaveBeenCalled()
-    expect(result.current.status.mode).toBe('mock')
-    expect(result.current.status.connectionStatus).toBe('mock')
-  })
-
   it('prevents double send while loading', async () => {
-    envState.mode = 'mock'
-    let resolveMock: ((value: { face: 'joy'; text: string }) => void) | undefined
-    sendMessageMock.mockImplementation(
+    envState.mode = 'connected'
+    let resolveDify: ((value: { answer: string; conversation_id: string }) => void) | undefined
+    sendMessageToDifyMock.mockImplementation(
       () =>
         new Promise((resolve) => {
-          resolveMock = resolve
+          resolveDify = resolve
         }),
     )
 
@@ -78,10 +52,10 @@ describe('useChatController', () => {
       void result.current.handleSend('second')
     })
 
-    expect(sendMessageMock).toHaveBeenCalledTimes(1)
+    expect(sendMessageToDifyMock).toHaveBeenCalledTimes(1)
 
     await act(async () => {
-      resolveMock?.({ face: 'joy', text: 'done' })
+      resolveDify?.({ answer: '{"face":"joy","text":"done"}', conversation_id: 'conv-1' })
       await Promise.resolve()
     })
   })
@@ -120,7 +94,7 @@ describe('useChatController', () => {
     expect(result.current.status.connectionStatus).toBe('connected')
   })
 
-  it('misconfigured does not call APIs', async () => {
+  it('misconfigured does not call API', async () => {
     envState.mode = 'misconfigured'
 
     const { result } = renderHook(() => useChatController())
@@ -129,7 +103,6 @@ describe('useChatController', () => {
       await result.current.handleSend('test')
     })
 
-    expect(sendMessageMock).not.toHaveBeenCalled()
     expect(sendMessageToDifyMock).not.toHaveBeenCalled()
     expect(result.current.status.mode).toBe('dify')
     expect(result.current.status.connectionStatus).toBe('misconfigured')

@@ -9,14 +9,12 @@ Difyを頭脳として使うAIアバターPoCです。
 
 ## Features
 
-- Mockモード（P1/P1.5）
-  - 表情順送り確認（`normal -> joy -> sad -> angry -> surprised`）
 - Dify連携（P2）
   - `POST /chat-messages` 呼び出し
   - `answer` を `AvatarResponse` に正規化
   - `conversation_id` 継続
 - ステータス・エラー制御（P3）
-  - `mock / connected / misconfigured / error`
+  - `connected / misconfigured / error`
   - loading中の二重送信防止、再送復帰
 - 体験強化（P4）
   - speaking状態表示、faceプレビュー、チャット内face表示
@@ -43,7 +41,6 @@ cp .env.example .env
 `.env` example:
 
 ```env
-VITE_USE_MOCK=true
 VITE_DIFY_API_URL=https://api.dify.ai/v1
 VITE_DIFY_API_KEY=
 VITE_DIFY_USER_ID=local-user-001
@@ -82,7 +79,6 @@ npm run dev
 1. Renderで `Web Service` を作成し、このリポジトリを接続
 2. ルートの `render.yaml` を利用
 3. Render Environment Variables を設定
-   - `VITE_USE_MOCK=false`
    - `VITE_TTS_PROVIDER=browser`（Render既定）
    - `VITE_DIFY_API_URL`
    - `VITE_DIFY_API_KEY`

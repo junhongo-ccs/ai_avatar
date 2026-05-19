@@ -2,7 +2,6 @@ import { useMemo, useRef, useState } from 'react'
 import { adaptDifyResponse } from '../../adapters/difyResponseAdapter'
 import { getDifyConfig, getDifyConnectionStatus, getTtsProvider } from '../../config/env'
 import { sendMessageToDify } from '../../services/difyClient'
-import { sendMessage, sendNextFaceSample } from '../../services/mockService'
 import { speakText } from '../../services/speechService'
 import type { ChatEntry } from '../../types/chat'
 import type { AppStatus } from '../../types/status'
@@ -10,8 +9,8 @@ import type { AppStatus } from '../../types/status'
 const createId = () => `${Date.now()}-${Math.random().toString(16).slice(2)}`
 
 const initialMessageByConnectionStatus = {
-  mock: 'モックMVPへようこそ。メッセージ送信か「次の表情」で確認できます。',
-  connected: 'Dify接続モードです。メッセージを送信して会話を開始してください。',
+  connected:
+    'Dify接続モードです。まずは新卒採用で気になることを質問してください（応募条件、選考フロー、初任給・働き方）。業務内容や提供ソリューションについての質問にも回答できます。',
   misconfigured: 'Dify設定が不足しています。.env を確認してください。',
   error: '通信エラーが発生しています。再送信を試してください。',
 } as const
@@ -20,7 +19,6 @@ export const useChatController = () => {
   const config = getDifyConfig()
   const envConnectionStatus = getDifyConnectionStatus(config)
   const ttsProvider = getTtsProvider()
-  const initialMode: AppStatus['mode'] = envConnectionStatus === 'mock' ? 'mock' : 'dify'
 
   const [entries, setEntries] = useState<ChatEntry[]>([
     {
@@ -31,7 +29,7 @@ export const useChatController = () => {
     },
   ])
   const [status, setStatus] = useState<AppStatus>({
-    mode: initialMode,
+    mode: 'dify',
     connectionStatus: envConnectionStatus,
     ttsProvider,
     isLoading: false,
@@ -61,7 +59,7 @@ export const useChatController = () => {
       ...prev,
       currentFace: face,
       errorMessage: undefined,
-      connectionStatus: prev.mode === 'dify' ? 'connected' : 'mock',
+      connectionStatus: 'connected',
     }))
     speakText(text, status.ttsProvider, {
       onStart: () => {
@@ -98,7 +96,7 @@ export const useChatController = () => {
     setStatus((prev) => ({
       ...prev,
       errorMessage: undefined,
-      connectionStatus: prev.mode === 'dify' ? 'connected' : 'mock',
+      connectionStatus: 'connected',
     }))
 
     if (status.connectionStatus === 'misconfigured') {
@@ -112,12 +110,6 @@ export const useChatController = () => {
     }
 
     try {
-      if (status.mode === 'mock') {
-        const response = await sendMessage(value)
-        pushAssistantResponse(response.text, response.face)
-        return
-      }
-
       const raw = await sendMessageToDify({ message: value, conversationId }, config)
       const adapted = adaptDifyResponse(raw)
       if (adapted.conversationId) {
@@ -128,32 +120,9 @@ export const useChatController = () => {
       setLoading(false)
       setStatus((prev) => ({
         ...prev,
-        connectionStatus: prev.mode === 'dify' ? 'error' : 'mock',
+        connectionStatus: 'error',
         isSpeaking: false,
-        errorMessage:
-          prev.mode === 'dify'
-            ? 'Dify応答の取得に失敗しました。接続情報とアプリ公開状態を確認してください。'
-            : 'モック応答の取得に失敗しました。',
-      }))
-    }
-  }
-
-  const handleNextFace = async () => {
-    if (status.mode !== 'mock' || loadingRef.current) {
-      return
-    }
-
-    setLoading(true)
-    setStatus((prev) => ({ ...prev, errorMessage: undefined, connectionStatus: 'mock' }))
-    try {
-      const response = await sendNextFaceSample()
-      pushAssistantResponse(response.text, response.face)
-    } catch {
-      setLoading(false)
-      setStatus((prev) => ({
-        ...prev,
-        isSpeaking: false,
-        errorMessage: '表情テストに失敗しました。',
+        errorMessage: 'Dify応答の取得に失敗しました。接続情報とアプリ公開状態を確認してください。',
       }))
     }
   }
@@ -165,7 +134,6 @@ export const useChatController = () => {
     status,
     latestError,
     handleSend,
-    handleNextFace,
     conversationId,
   }
 }

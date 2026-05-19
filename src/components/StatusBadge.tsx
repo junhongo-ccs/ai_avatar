@@ -19,9 +19,7 @@ export const StatusBadge = ({ status }: StatusBadgeProps) => {
       ? 'border-amber-200 bg-amber-50 text-amber-800'
       : status.connectionStatus === 'error'
         ? 'border-rose-200 bg-rose-50 text-rose-800'
-        : status.connectionStatus === 'connected'
-        ? 'border-sky-200 bg-sky-50 text-sky-800'
-        : 'border-emerald-200 bg-emerald-50 text-emerald-800'
+        : 'border-sky-200 bg-sky-50 text-sky-800'
 
   return (
     <div

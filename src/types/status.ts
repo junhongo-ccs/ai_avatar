@@ -1,10 +1,10 @@
 import type { Face } from './avatar'
 import type { TtsProvider } from './config'
 
-export type ConnectionStatus = 'mock' | 'connected' | 'misconfigured' | 'error'
+export type ConnectionStatus = 'connected' | 'misconfigured' | 'error'
 
 export type AppStatus = {
-  mode: 'mock' | 'dify'
+  mode: 'dify'
   connectionStatus: ConnectionStatus
   ttsProvider: TtsProvider
   isLoading: boolean

@@ -69,16 +69,16 @@ export const ChatInput = ({ disabled = false, onSend }: ChatInputProps) => {
 
   return (
     <div>
-      <form onSubmit={submit} className="mt-4 flex gap-2">
+      <form onSubmit={submit} className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center">
         <input
-          className="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2"
+          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2"
           value={text}
           onChange={(event) => setText(event.target.value)}
           placeholder="メッセージを入力"
           disabled={disabled}
         />
         <button
-          className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+          className="whitespace-nowrap rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
           type="button"
           disabled={!speechSupported || disabled}
           onClick={toggleListening}

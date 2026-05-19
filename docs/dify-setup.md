@@ -54,7 +54,6 @@ Example expected answer:
 Set `.env`:
 
 ```env
-VITE_USE_MOCK=false
 VITE_DIFY_API_URL=https://api.dify.ai/v1
 VITE_DIFY_API_KEY=***
 VITE_DIFY_USER_ID=local-user-001
@@ -62,5 +61,5 @@ VITE_DIFY_USER_ID=local-user-001
 
 ## 7. Notes
 
-- If env is incomplete, app should remain in `misconfigured` and must not auto-fallback to mock.
+- If env is incomplete, app should remain in `misconfigured`.
 - Adapter must normalize Dify raw response before UI.

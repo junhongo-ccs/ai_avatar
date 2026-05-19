@@ -20,7 +20,7 @@ type ParseOptions = {
 
 export const parseAvatarResponse = (raw: string, options?: ParseOptions): AvatarResponse => {
   const trimmed = raw.trim()
-  const source = options?.source ?? 'mock'
+  const source = options?.source ?? 'dify'
   const fallbackText = options?.fallbackText ?? '応答を解釈できませんでした。'
 
   try {

@@ -22,14 +22,14 @@ export const ChatLog = ({ entries }: ChatLogProps) => {
   }, [entries])
 
   return (
-    <div className="h-[30rem] overflow-y-auto rounded-2xl border border-slate-300 bg-white p-4">
+    <div className="h-[44vh] min-h-[16rem] max-h-[34rem] overflow-y-auto rounded-2xl border border-slate-300 bg-white p-4 lg:h-auto lg:min-h-0 lg:max-h-none lg:flex-1">
       <ul className="space-y-3">
         {entries.map((entry) => (
           <li
             key={entry.id}
             className={`flex ${entry.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
-            <div className={`max-w-[85%] ${entry.role === 'user' ? 'items-end' : 'items-start'} flex flex-col`}>
+            <div className={`max-w-[90%] ${entry.role === 'user' ? 'items-end' : 'items-start'} flex flex-col sm:max-w-[85%]`}>
               <p className="mb-1 flex items-center gap-2 text-xs text-slate-500">
                 <span>{entry.role}</span>
                 {entry.face ? (
