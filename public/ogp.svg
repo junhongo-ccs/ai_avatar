@@ -82,7 +82,7 @@
     <path class="st6" d="M326,122h180c14.36,0,26,11.64,26,26h0c0,14.36-11.64,26-26,26h-180c-14.36,0-26-11.64-26-26h0c0-14.36,11.64-26,26-26Z"/>
     <text class="st5" transform="translate(314.49 156)"><tspan x="0" y="0">Dify Connected</tspan></text>
     <text class="st3" transform="translate(300 246)"><tspan x="0" y="0">AI Avatar PoC</tspan></text>
-    <text class="st4" transform="translate(300 308)"><tspan x="0" y="0">会話・表情・音声をつなぐ社内デモ基盤</tspan></text>
+    <text class="st4" transform="translate(300 308)"><tspan x="0" y="0">採用ナレッジとソリューションに対応</tspan></text>
     <g>
       <rect class="st9" x="300" y="366" width="744" height="180" rx="24" ry="24"/>
       <text class="st1" transform="translate(332 436)"><tspan x="0" y="0">mode: dify / status: connected</tspan></text>
