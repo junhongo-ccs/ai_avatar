@@ -70,7 +70,14 @@ Render公開版では Browser TTS を使用します。
    - `VITE_DIFY_API_URL`
    - `VITE_DIFY_API_KEY`
    - `VITE_DIFY_USER_ID`
+   - 必要なら `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD`
 4. デプロイ完了後、Render URLで動作確認
+
+### Basic認証（任意）
+
+- `BASIC_AUTH_USER` と `BASIC_AUTH_PASSWORD` の両方を設定すると、サイト全体と `/api` に Basic 認証をかけます
+- どちらか片方だけでは有効になりません
+- 研修用PoCなど、少人数向けの簡易保護を想定しています
 
 ### Render公開版の動作確認結果
 

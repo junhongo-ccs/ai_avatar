@@ -15,6 +15,39 @@ const makeBinaryResponse = (buffer, ok = true, status = 200) => ({
 })
 
 describe('VOICEVOX backend route', () => {
+  it('requires basic auth when configured', async () => {
+    const app = createApp({
+      fetchImpl: vi.fn(),
+      basicAuthUser: 'demo',
+      basicAuthPassword: 'secret',
+    })
+
+    const response = await request(app).post('/api/tts/voicevox').send({ text: 'hello' })
+    expect(response.status).toBe(401)
+    expect(response.headers['www-authenticate']).toContain('Basic')
+  })
+
+  it('accepts requests with valid basic auth', async () => {
+    const wav = Buffer.from([82, 73, 70, 70, 0, 0, 0, 0, 87, 65, 86, 69])
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(makeJsonResponse({ speedScale: 1.0 }))
+      .mockResolvedValueOnce(makeBinaryResponse(wav))
+
+    const app = createApp({
+      fetchImpl: fetchMock,
+      basicAuthUser: 'demo',
+      basicAuthPassword: 'secret',
+    })
+
+    const response = await request(app)
+      .post('/api/tts/voicevox')
+      .auth('demo', 'secret')
+      .send({ text: 'hello', speaker: 1 })
+
+    expect(response.status).toBe(200)
+  })
+
   it('returns 400 when text is missing', async () => {
     const app = createApp({ fetchImpl: vi.fn() })
     const response = await request(app).post('/api/tts/voicevox').send({ text: '   ' })

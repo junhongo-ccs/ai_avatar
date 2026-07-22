@@ -5,8 +5,51 @@ const parseSpeaker = (value, fallback) => {
   return Number.isFinite(parsed) ? parsed : fallback
 }
 
-export const createApp = ({ fetchImpl = fetch, engineUrl, defaultSpeaker } = {}) => {
+const readBasicCredentials = (header) => {
+  if (typeof header !== 'string' || !header.startsWith('Basic ')) {
+    return null
+  }
+
+  try {
+    const decoded = Buffer.from(header.slice(6), 'base64').toString('utf8')
+    const separatorIndex = decoded.indexOf(':')
+    if (separatorIndex < 0) {
+      return null
+    }
+
+    return {
+      user: decoded.slice(0, separatorIndex),
+      password: decoded.slice(separatorIndex + 1),
+    }
+  } catch {
+    return null
+  }
+}
+
+export const createApp = ({
+  fetchImpl = fetch,
+  engineUrl,
+  defaultSpeaker,
+  basicAuthUser,
+  basicAuthPassword,
+} = {}) => {
   const app = express()
+  const authUser = basicAuthUser ?? process.env.BASIC_AUTH_USER ?? ''
+  const authPassword = basicAuthPassword ?? process.env.BASIC_AUTH_PASSWORD ?? ''
+  const authEnabled = authUser.length > 0 && authPassword.length > 0
+
+  if (authEnabled) {
+    app.use((req, res, next) => {
+      const credentials = readBasicCredentials(req.headers.authorization)
+      if (credentials?.user === authUser && credentials.password === authPassword) {
+        return next()
+      }
+
+      res.setHeader('WWW-Authenticate', 'Basic realm="AI Avatar"')
+      return res.status(401).send('Authentication required')
+    })
+  }
+
   app.use(express.json())
 
   const vvEngineUrl = (engineUrl ?? process.env.VOICEVOX_ENGINE_URL ?? 'http://127.0.0.1:50021').replace(/\/$/, '')
