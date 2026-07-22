@@ -10,7 +10,7 @@ const createId = () => `${Date.now()}-${Math.random().toString(16).slice(2)}`
 
 const initialMessageByConnectionStatus = {
   connected:
-    'Dify接続モードです。まずは新卒採用で気になることを質問してください（応募条件、選考フロー、初任給・働き方）。業務内容や提供ソリューションについての質問にも回答できます。',
+    'こんにちは。新卒採用に関する内容を中心にご案内できます。気になることがあれば、お気軽に聞いてください。',
   misconfigured: 'Dify設定が不足しています。.env を確認してください。',
   error: '通信エラーが発生しています。再送信を試してください。',
 } as const
