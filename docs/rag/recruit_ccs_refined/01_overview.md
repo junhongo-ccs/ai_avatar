@@ -39,11 +39,8 @@
 
 ## 対象ファイル
 
-- `02_mynavi_company_overview.md`
-- `03_current_spec.md`
-- `04_decision_rules.md`
-- `05_faq.md`
-- `06_mynavi_master_fulltext.md`
+- `00_QA.md`
+
 
 ## 回答方針（概要）
 
