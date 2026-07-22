@@ -23,7 +23,11 @@ export const AudioToggle = ({ checked, onChange }: AudioToggleProps) => {
           }`}
         />
       </button>
-      <span className={`text-xs font-semibold ${checked ? 'text-cyan-700' : 'text-slate-500'}`}>
+      <span
+        className={`inline-flex w-7 justify-center text-xs font-semibold ${
+          checked ? 'text-cyan-700' : 'text-slate-500'
+        }`}
+      >
         {checked ? 'ON' : 'OFF'}
       </span>
     </label>
