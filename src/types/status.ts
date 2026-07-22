@@ -7,6 +7,7 @@ export type AppStatus = {
   mode: 'dify'
   connectionStatus: ConnectionStatus
   ttsProvider: TtsProvider
+  audioEnabled: boolean
   isLoading: boolean
   isSpeaking: boolean
   errorMessage?: string

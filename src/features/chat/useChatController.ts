@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import { adaptDifyResponse } from '../../adapters/difyResponseAdapter'
 import { getDifyConfig, getDifyConnectionStatus, getTtsProvider } from '../../config/env'
 import { sendMessageToDify } from '../../services/difyClient'
-import { speakText } from '../../services/speechService'
+import { speakText, stopSpeaking } from '../../services/speechService'
 import type { ChatEntry } from '../../types/chat'
 import type { AppStatus } from '../../types/status'
 
@@ -32,6 +32,7 @@ export const useChatController = () => {
     mode: 'dify',
     connectionStatus: envConnectionStatus,
     ttsProvider,
+    audioEnabled: true,
     isLoading: false,
     isSpeaking: false,
     currentFace: 'normal',
@@ -61,6 +62,10 @@ export const useChatController = () => {
       errorMessage: undefined,
       connectionStatus: 'connected',
     }))
+    if (!status.audioEnabled) {
+      return
+    }
+
     speakText(text, status.ttsProvider, {
       onStart: () => {
         setStatus((prev) => ({ ...prev, isSpeaking: true }))
@@ -72,6 +77,18 @@ export const useChatController = () => {
         setStatus((prev) => ({ ...prev, errorMessage: message }))
       },
     })
+  }
+
+  const setAudioEnabled = (enabled: boolean) => {
+    if (!enabled) {
+      stopSpeaking()
+    }
+
+    setStatus((prev) => ({
+      ...prev,
+      audioEnabled: enabled,
+      isSpeaking: enabled ? prev.isSpeaking : false,
+    }))
   }
 
   const handleSend = async (text: string) => {
@@ -134,6 +151,7 @@ export const useChatController = () => {
     status,
     latestError,
     handleSend,
+    setAudioEnabled,
     conversationId,
   }
 }

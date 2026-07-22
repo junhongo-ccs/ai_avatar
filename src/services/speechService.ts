@@ -6,6 +6,20 @@ type SpeakCallbacks = {
   onFallback?: (message: string) => void
 }
 
+let activeAudio: HTMLAudioElement | null = null
+
+export const stopSpeaking = (): void => {
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    window.speechSynthesis.cancel()
+  }
+
+  if (activeAudio) {
+    activeAudio.pause()
+    activeAudio.currentTime = 0
+    activeAudio = null
+  }
+}
+
 const speakWithBrowser = (text: string, callbacks?: SpeakCallbacks): void => {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
     callbacks?.onEnd?.()
@@ -25,7 +39,7 @@ const speakWithBrowser = (text: string, callbacks?: SpeakCallbacks): void => {
   utterance.onerror = () => callbacks?.onEnd?.()
 
   try {
-    window.speechSynthesis.cancel()
+    stopSpeaking()
     window.speechSynthesis.speak(utterance)
   } catch {
     callbacks?.onEnd?.()
@@ -53,19 +67,24 @@ const speakWithVoicevox = async (text: string, callbacks?: SpeakCallbacks): Prom
   const url = URL.createObjectURL(blob)
 
   try {
+    stopSpeaking()
     const audio = new Audio(url)
+    activeAudio = audio
     audio.onplay = () => callbacks?.onStart?.()
     audio.onended = () => {
+      activeAudio = null
       URL.revokeObjectURL(url)
       callbacks?.onEnd?.()
     }
     audio.onerror = () => {
+      activeAudio = null
       URL.revokeObjectURL(url)
       callbacks?.onEnd?.()
     }
 
     await audio.play()
   } catch {
+    activeAudio = null
     URL.revokeObjectURL(url)
     callbacks?.onEnd?.()
     throw new Error('VOICEVOX play failed')

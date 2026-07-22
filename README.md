@@ -60,6 +60,9 @@ npm run dev
 
 Render公開版では Browser TTS を使用します。
 
+公開URL:
+- https://ai-avatar-foas.onrender.com/
+
 1. Renderで `Web Service` を作成し、このリポジトリを接続
 2. ルートの `render.yaml` を利用
 3. Render Environment Variables を設定

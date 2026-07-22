@@ -37,6 +37,9 @@ export const StatusBadge = ({ status }: StatusBadgeProps) => {
         speaking: {status.isSpeaking ? 'on' : 'off'}
       </span>
       <span className="rounded bg-white px-2 py-0.5 text-xs font-medium text-slate-700">
+        audio: {status.audioEnabled ? 'on' : 'off'}
+      </span>
+      <span className="rounded bg-white px-2 py-0.5 text-xs font-medium text-slate-700">
         tts: {status.ttsProvider}
       </span>
     </div>

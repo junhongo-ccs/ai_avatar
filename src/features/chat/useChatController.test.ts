@@ -8,6 +8,7 @@ const envState = {
 
 const sendMessageToDifyMock = vi.fn()
 const speakTextMock = vi.fn()
+const stopSpeakingMock = vi.fn()
 
 vi.mock('../../config/env', () => ({
   getDifyConfig: () => ({
@@ -25,6 +26,7 @@ vi.mock('../../services/difyClient', () => ({
 
 vi.mock('../../services/speechService', () => ({
   speakText: (...args: unknown[]) => speakTextMock(...args),
+  stopSpeaking: () => stopSpeakingMock(),
 }))
 
 import { useChatController } from './useChatController'
@@ -32,6 +34,7 @@ import { useChatController } from './useChatController'
 beforeEach(() => {
   sendMessageToDifyMock.mockReset()
   speakTextMock.mockReset()
+  stopSpeakingMock.mockReset()
 })
 
 describe('useChatController', () => {
@@ -146,5 +149,37 @@ describe('useChatController', () => {
     expect(result.current.status.connectionStatus).toBe('connected')
     expect(result.current.status.isLoading).toBe(false)
     expect(result.current.latestError).toBeUndefined()
+  })
+
+  it('does not speak when audio is turned off', async () => {
+    envState.mode = 'connected'
+    sendMessageToDifyMock.mockResolvedValueOnce({
+      answer: '{"face":"joy","text":"audio off"}',
+      conversation_id: 'conv-off',
+    })
+
+    const { result } = renderHook(() => useChatController())
+
+    act(() => {
+      result.current.setAudioEnabled(false)
+    })
+
+    await act(async () => {
+      await result.current.handleSend('first')
+    })
+
+    expect(speakTextMock).not.toHaveBeenCalled()
+    expect(result.current.status.audioEnabled).toBe(false)
+  })
+
+  it('stops current speech when audio is turned off', () => {
+    envState.mode = 'connected'
+    const { result } = renderHook(() => useChatController())
+
+    act(() => {
+      result.current.setAudioEnabled(false)
+    })
+
+    expect(stopSpeakingMock).toHaveBeenCalledTimes(1)
   })
 })

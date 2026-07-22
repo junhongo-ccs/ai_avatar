@@ -1,3 +1,4 @@
+import { AudioToggle } from './components/AudioToggle'
 import { AvatarDisplay } from './components/AvatarDisplay'
 import { ChatInput } from './components/ChatInput'
 import { ChatLog } from './components/ChatLog'
@@ -6,15 +7,19 @@ import { StatusBadge } from './components/StatusBadge'
 import { useChatController } from './features/chat/useChatController'
 
 export const App = () => {
-  const { entries, status, latestError, handleSend, conversationId } = useChatController()
+  const { entries, status, latestError, handleSend, setAudioEnabled, conversationId } =
+    useChatController()
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-[1600px] flex-col px-4 py-4 md:px-6 md:py-6 lg:h-dvh lg:overflow-hidden">
-      <header className="mb-4 shrink-0">
-        <h1 className="text-2xl font-bold text-slate-900">AI Avatar | Recruitment </h1>
-        {conversationId ? (
-          <p className="mt-1 text-xs text-slate-600">conversation_id: {conversationId}</p>
-        ) : null}
+      <header className="mb-4 flex shrink-0 flex-col gap-3 md:flex-row md:items-start md:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">AI Avatar | Recruitment </h1>
+          {conversationId ? (
+            <p className="mt-1 text-xs text-slate-600">conversation_id: {conversationId}</p>
+          ) : null}
+        </div>
+        <AudioToggle checked={status.audioEnabled} onChange={setAudioEnabled} />
       </header>
 
       <section className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-[minmax(280px,340px)_minmax(0,1fr)] lg:items-stretch lg:overflow-hidden">
