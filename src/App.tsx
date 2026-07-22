@@ -11,7 +11,7 @@ export const App = () => {
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-[1600px] flex-col px-4 py-4 md:px-6 md:py-6 lg:h-dvh lg:overflow-hidden">
       <header className="mb-4 shrink-0">
-        <h1 className="text-2xl font-bold text-slate-900">AI Avatar | Recruitment and Solutions</h1>
+        <h1 className="text-2xl font-bold text-slate-900">AI Avatar | Recruitment </h1>
         {conversationId ? (
           <p className="mt-1 text-xs text-slate-600">conversation_id: {conversationId}</p>
         ) : null}
