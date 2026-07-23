@@ -97,6 +97,27 @@ describe('useChatController', () => {
     expect(result.current.status.connectionStatus).toBe('connected')
   })
 
+  it('returns face to normal after a sad response when next answer is plain text', async () => {
+    envState.mode = 'connected'
+    sendMessageToDifyMock
+      .mockResolvedValueOnce({ answer: '{"face":"sad","text":"first"}', conversation_id: 'conv-1' })
+      .mockResolvedValueOnce({ answer: 'タグなしの通常応答です', conversation_id: 'conv-1' })
+
+    const { result } = renderHook(() => useChatController())
+
+    await act(async () => {
+      await result.current.handleSend('first')
+    })
+
+    expect(result.current.status.currentFace).toBe('sad')
+
+    await act(async () => {
+      await result.current.handleSend('second')
+    })
+
+    expect(result.current.status.currentFace).toBe('normal')
+  })
+
   it('misconfigured does not call API', async () => {
     envState.mode = 'misconfigured'
 
