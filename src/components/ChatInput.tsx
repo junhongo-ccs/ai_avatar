@@ -71,7 +71,7 @@ export const ChatInput = ({ disabled = false, onSend }: ChatInputProps) => {
     <div>
       <form onSubmit={submit} className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center">
         <input
-          className="w-full rounded-xl border border-[rgb(87_121_160)] bg-white px-3 py-2"
+          className="w-full rounded-xl border border-[rgb(87_121_160)] bg-white px-3 py-2 focus:border-[rgb(0_83_203)] focus:outline-none focus:ring-2 focus:ring-[rgb(0_83_203)]"
           value={text}
           onChange={(event) => setText(event.target.value)}
           placeholder="メッセージを入力"
