@@ -8,7 +8,8 @@ import type { ChatEntry } from '../../types/chat'
 import type { AppStatus } from '../../types/status'
 
 const createId = () => `${Date.now()}-${Math.random().toString(16).slice(2)}`
-const FACE_HOLD_MS = 1500
+const SPOKEN_FACE_HOLD_MS = 1500
+const SILENT_FACE_HOLD_MS = 10000
 
 const initialMessageByConnectionStatus = {
   connected:
@@ -51,13 +52,13 @@ export const useChatController = () => {
     }
   }
 
-  const scheduleIdleFace = (sequence: number) => {
+  const scheduleIdleFace = (sequence: number, delayMs = SPOKEN_FACE_HOLD_MS) => {
     clearFaceResetTimer()
     faceResetTimerRef.current = setTimeout(() => {
       if (sequence === responseSequenceRef.current) {
         setStatus((prev) => ({ ...prev, currentFace: 'idle' }))
       }
-    }, FACE_HOLD_MS)
+    }, delayMs)
   }
 
   useEffect(() => clearFaceResetTimer, [])
@@ -89,7 +90,7 @@ export const useChatController = () => {
       connectionStatus: 'connected',
     }))
     if (!status.audioEnabled) {
-      scheduleIdleFace(responseSequence)
+      scheduleIdleFace(responseSequence, SILENT_FACE_HOLD_MS)
       return
     }
 
@@ -110,7 +111,7 @@ export const useChatController = () => {
   const setAudioEnabled = (enabled: boolean) => {
     if (!enabled) {
       stopSpeaking()
-      scheduleIdleFace(responseSequenceRef.current)
+      scheduleIdleFace(responseSequenceRef.current, SILENT_FACE_HOLD_MS)
     }
 
     setStatus((prev) => ({

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { speakText } from './speechService'
 
 class UtteranceMock {
@@ -34,6 +34,10 @@ class AudioMock {
 }
 
 describe('speechService', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   beforeEach(() => {
     AudioMock.shouldFail = false
     vi.restoreAllMocks()
@@ -68,6 +72,22 @@ describe('speechService', () => {
     expect(window.speechSynthesis.speak).toHaveBeenCalledTimes(1)
     expect(onStart).toHaveBeenCalled()
     expect(onEnd).toHaveBeenCalled()
+  })
+
+  it('does not cancel browser speech when the end-event fallback runs', () => {
+    vi.useFakeTimers()
+    const onEnd = vi.fn()
+    ;(window.speechSynthesis.speak as ReturnType<typeof vi.fn>).mockImplementation(
+      (utterance: UtteranceMock) => {
+        utterance.onstart?.()
+      },
+    )
+
+    speakText('フォールバック確認', 'browser', { onEnd })
+    vi.advanceTimersByTime(8000)
+
+    expect(window.speechSynthesis.cancel).toHaveBeenCalledTimes(1)
+    expect(onEnd).toHaveBeenCalledTimes(1)
   })
 
   it('calls voicevox endpoint when provider is voicevox', async () => {

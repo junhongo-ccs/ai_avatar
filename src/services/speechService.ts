@@ -12,10 +12,11 @@ let activeAudio: HTMLAudioElement | null = null
 // event (backgrounded tab, long utterance, interrupted playback), which would
 // otherwise leave the avatar's face stuck indefinitely. This estimates a
 // generous upper bound on speech duration and forces onEnd if the real event
-// never arrives.
-const BROWSER_TTS_MS_PER_CHAR = 150
-const BROWSER_TTS_MIN_FALLBACK_MS = 4000
-const BROWSER_TTS_MAX_FALLBACK_MS = 30000
+// never arrives. It is intentionally conservative: normal completion is still
+// driven by the real `end` event, while this is only the last-resort safeguard.
+const BROWSER_TTS_MS_PER_CHAR = 300
+const BROWSER_TTS_MIN_FALLBACK_MS = 8000
+const BROWSER_TTS_MAX_FALLBACK_MS = 90000
 
 export const stopSpeaking = (): void => {
   if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
@@ -55,10 +56,9 @@ const speakWithBrowser = (text: string, callbacks?: SpeakCallbacks): void => {
   }
 
   const finishFromFallback = () => {
-    // The fallback fired before the browser's real onend/onerror, so the
-    // utterance may still be speaking - cancel it so audio and avatar state
-    // (which reverts to idle once onEnd fires) don't drift apart.
-    window.speechSynthesis.cancel()
+    // Some browsers lose the end event while the utterance keeps playing.
+    // Never cancel here: this timer only prevents the avatar state from
+    // remaining stuck, and must not truncate the user's audio response.
     finish()
   }
 
