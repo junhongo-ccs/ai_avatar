@@ -1,17 +1,8 @@
 import { useEffect, useRef } from 'react'
-import type { Face } from '../types/avatar'
 import type { ChatEntry } from '../types/chat'
 
 type ChatLogProps = {
   entries: ChatEntry[]
-}
-
-const FACE_LABELS: Record<Face, string> = {
-  normal: 'normal',
-  joy: 'joy',
-  sad: 'sad',
-  angry: 'concerned',
-  surprised: 'surprised',
 }
 
 export const ChatLog = ({ entries }: ChatLogProps) => {
@@ -22,7 +13,7 @@ export const ChatLog = ({ entries }: ChatLogProps) => {
   }, [entries])
 
   return (
-    <div className="h-[44vh] min-h-[16rem] max-h-[34rem] overflow-y-auto rounded-2xl border border-slate-300 bg-white p-4 lg:h-auto lg:min-h-0 lg:max-h-none lg:flex-1">
+    <div className="h-[44vh] min-h-[16rem] max-h-[34rem] overflow-y-auto rounded-2xl bg-[oklch(93.2%_0.032_255.585)] p-4 lg:h-auto lg:min-h-0 lg:max-h-none lg:flex-1">
       <ul className="space-y-3">
         {entries.map((entry) => (
           <li
@@ -31,20 +22,15 @@ export const ChatLog = ({ entries }: ChatLogProps) => {
           >
             <div className={`max-w-[90%] ${entry.role === 'user' ? 'items-end' : 'items-start'} flex flex-col sm:max-w-[85%]`}>
               <p className="mb-1 flex items-center gap-2 text-xs text-slate-500">
-                <span>{entry.role}</span>
-                {entry.face ? (
-                  <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
-                    face: {FACE_LABELS[entry.face]}
-                  </span>
-                ) : null}
+                <span>{entry.role === 'user' ? 'あなた' : 'CCS人事'}</span>
               </p>
               <p
                 className={`rounded-2xl px-4 py-2 text-sm leading-relaxed ${
                   entry.role === 'user'
-                    ? 'rounded-br-md bg-sky-600 text-white'
+                    ? 'rounded-br-none bg-[rgb(174_225_254)] text-black'
                     : entry.role === 'assistant'
-                      ? 'rounded-bl-md bg-slate-100 text-slate-900'
-                      : 'bg-amber-50 text-amber-900'
+                      ? 'rounded-bl-none bg-sky-600 text-white'
+                      : 'rounded-bl-none bg-sky-600 text-white'
                 }`}
               >
                 {entry.text}

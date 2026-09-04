@@ -76,6 +76,7 @@ Dify raw response is never consumed directly by UI components. Raw payload is ab
 - Controller stores `conversation_id` from Dify response
 - Next Dify request sends same `conversation_id`
 - This enables continuous multi-turn conversation
+- `conversation_id` is an internal Dify conversation identifier. It is retained only by the controller and is never displayed in the user interface.
 
 ## Why real-time answers are limited today
 

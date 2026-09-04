@@ -16,10 +16,10 @@ const FACE_LABELS: Record<Face, string> = {
 export const StatusBadge = ({ status }: StatusBadgeProps) => {
   const tone =
     status.connectionStatus === 'misconfigured'
-      ? 'border-amber-200 bg-amber-50 text-amber-800'
+      ? 'border-[rgb(87_121_160)] bg-amber-50 text-amber-800'
       : status.connectionStatus === 'error'
-        ? 'border-rose-200 bg-rose-50 text-rose-800'
-        : 'border-sky-200 bg-sky-50 text-sky-800'
+        ? 'border-[rgb(87_121_160)] bg-rose-50 text-rose-800'
+        : 'border-[rgb(87_121_160)] bg-sky-50 text-sky-800'
 
   return (
     <div

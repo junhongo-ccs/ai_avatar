@@ -71,14 +71,14 @@ export const ChatInput = ({ disabled = false, onSend }: ChatInputProps) => {
     <div>
       <form onSubmit={submit} className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center">
         <input
-          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2"
+          className="w-full rounded-xl border border-[rgb(87_121_160)] bg-white px-3 py-2"
           value={text}
           onChange={(event) => setText(event.target.value)}
           placeholder="メッセージを入力"
           disabled={disabled}
         />
         <button
-          className="whitespace-nowrap rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+          className="whitespace-nowrap rounded-xl border border-[rgb(87_121_160)] bg-white px-3 py-2 text-sm text-slate-800 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
           type="button"
           disabled={!speechSupported || disabled}
           onClick={toggleListening}
@@ -86,7 +86,7 @@ export const ChatInput = ({ disabled = false, onSend }: ChatInputProps) => {
           {isListening ? 'マイク入力停止' : 'マイク入力開始'}
         </button>
         <button
-          className="rounded-xl bg-slate-900 px-4 py-2 text-white disabled:cursor-not-allowed disabled:bg-slate-500"
+          className="rounded-xl bg-[rgb(0_83_203)] px-4 py-2 text-white disabled:cursor-not-allowed disabled:bg-slate-500"
           type="submit"
           disabled={disabled || text.trim().length === 0}
         >

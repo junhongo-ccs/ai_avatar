@@ -5,7 +5,7 @@ type AudioToggleProps = {
 
 export const AudioToggle = ({ checked, onChange }: AudioToggleProps) => {
   return (
-    <label className="inline-flex items-center gap-3 rounded-full border border-slate-300 bg-white px-3 py-2 shadow-sm">
+    <label className="inline-flex items-center gap-3 rounded-full border border-[rgb(87_121_160)] bg-white px-3 py-2 shadow-sm">
       <span className="text-sm font-medium text-slate-700">応答音声</span>
       <button
         type="button"
@@ -14,7 +14,7 @@ export const AudioToggle = ({ checked, onChange }: AudioToggleProps) => {
         aria-label="応答音声のオンオフ"
         onClick={() => onChange(!checked)}
         className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
-          checked ? 'bg-cyan-600' : 'bg-slate-300'
+          checked ? 'bg-[rgb(0_114_225)]' : 'bg-slate-300'
         }`}
       >
         <span
