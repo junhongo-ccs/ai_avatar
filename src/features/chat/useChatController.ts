@@ -154,6 +154,7 @@ export const useChatController = () => {
         ...prev,
         errorMessage: 'Dify設定が不足しています。.env の VITE_DIFY_* を確認してください。',
         connectionStatus: 'misconfigured',
+        currentFace: 'idle',
       }))
       return
     }
@@ -171,6 +172,7 @@ export const useChatController = () => {
         ...prev,
         connectionStatus: 'error',
         isSpeaking: false,
+        currentFace: 'idle',
         errorMessage: 'Dify応答の取得に失敗しました。接続情報とアプリ公開状態を確認してください。',
       }))
     }

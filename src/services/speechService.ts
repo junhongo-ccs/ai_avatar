@@ -8,6 +8,15 @@ type SpeakCallbacks = {
 
 let activeAudio: HTMLAudioElement | null = null
 
+// Chrome/Firefox are known to sometimes drop SpeechSynthesisUtterance's `end`
+// event (backgrounded tab, long utterance, interrupted playback), which would
+// otherwise leave the avatar's face stuck indefinitely. This estimates a
+// generous upper bound on speech duration and forces onEnd if the real event
+// never arrives.
+const BROWSER_TTS_MS_PER_CHAR = 150
+const BROWSER_TTS_MIN_FALLBACK_MS = 4000
+const BROWSER_TTS_MAX_FALLBACK_MS = 30000
+
 export const stopSpeaking = (): void => {
   if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
     window.speechSynthesis.cancel()
@@ -32,17 +41,44 @@ const speakWithBrowser = (text: string, callbacks?: SpeakCallbacks): void => {
     return
   }
 
+  let ended = false
+  let fallbackTimer: ReturnType<typeof setTimeout> | undefined
+  const finish = () => {
+    if (ended) {
+      return
+    }
+    ended = true
+    if (fallbackTimer) {
+      clearTimeout(fallbackTimer)
+    }
+    callbacks?.onEnd?.()
+  }
+
+  const finishFromFallback = () => {
+    // The fallback fired before the browser's real onend/onerror, so the
+    // utterance may still be speaking - cancel it so audio and avatar state
+    // (which reverts to idle once onEnd fires) don't drift apart.
+    window.speechSynthesis.cancel()
+    finish()
+  }
+
+  const estimatedMs = Math.min(
+    BROWSER_TTS_MAX_FALLBACK_MS,
+    Math.max(BROWSER_TTS_MIN_FALLBACK_MS, value.length * BROWSER_TTS_MS_PER_CHAR),
+  )
+  fallbackTimer = setTimeout(finishFromFallback, estimatedMs)
+
   const utterance = new SpeechSynthesisUtterance(value)
   utterance.lang = 'ja-JP'
   utterance.onstart = () => callbacks?.onStart?.()
-  utterance.onend = () => callbacks?.onEnd?.()
-  utterance.onerror = () => callbacks?.onEnd?.()
+  utterance.onend = finish
+  utterance.onerror = finish
 
   try {
     stopSpeaking()
     window.speechSynthesis.speak(utterance)
   } catch {
-    callbacks?.onEnd?.()
+    finish()
   }
 }
 

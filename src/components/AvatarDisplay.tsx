@@ -1,15 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import type { DisplayFace } from '../types/avatar'
+import { FACE_LABELS, type DisplayFace } from '../types/avatar'
 import { getAvatarImagePath } from '../utils/getAvatarImagePath'
-
-const FACE_META: Record<DisplayFace, { label: string }> = {
-  idle: { label: 'idle' },
-  normal: { label: 'normal' },
-  joy: { label: 'joy' },
-  sad: { label: 'sad' },
-  angry: { label: 'concerned' },
-  surprised: { label: 'surprised' },
-}
 
 type AvatarDisplayProps = {
   face: DisplayFace
@@ -22,7 +13,6 @@ export const AvatarDisplay = ({ face, isSpeaking }: AvatarDisplayProps) => {
   const [isTransitioning, setIsTransitioning] = useState(false)
   const visibleFaceRef = useRef(face)
   const transitionTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
-  const current = FACE_META[visibleFace]
 
   useEffect(() => {
     if (face === visibleFaceRef.current) {
@@ -61,7 +51,7 @@ export const AvatarDisplay = ({ face, isSpeaking }: AvatarDisplayProps) => {
     <div className="rounded-2xl border border-[rgb(87_121_160)] bg-sky-50 p-5 shadow-sm">
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-          face: {current.label}
+          face: {FACE_LABELS[visibleFace]}
         </span>
         <span
           className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
