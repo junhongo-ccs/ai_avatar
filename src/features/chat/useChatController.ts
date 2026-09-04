@@ -1,12 +1,14 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { adaptDifyResponse } from '../../adapters/difyResponseAdapter'
 import { getDifyConfig, getDifyConnectionStatus, getTtsProvider } from '../../config/env'
 import { sendMessageToDify } from '../../services/difyClient'
 import { speakText, stopSpeaking } from '../../services/speechService'
+import type { Face } from '../../types/avatar'
 import type { ChatEntry } from '../../types/chat'
 import type { AppStatus } from '../../types/status'
 
 const createId = () => `${Date.now()}-${Math.random().toString(16).slice(2)}`
+const FACE_HOLD_MS = 1500
 
 const initialMessageByConnectionStatus = {
   connected:
@@ -35,17 +37,41 @@ export const useChatController = () => {
     audioEnabled: true,
     isLoading: false,
     isSpeaking: false,
-    currentFace: 'normal',
+    currentFace: 'idle',
   })
   const [conversationId, setConversationId] = useState<string | undefined>(undefined)
   const loadingRef = useRef(false)
+  const faceResetTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const responseSequenceRef = useRef(0)
+
+  const clearFaceResetTimer = () => {
+    if (faceResetTimerRef.current) {
+      clearTimeout(faceResetTimerRef.current)
+      faceResetTimerRef.current = undefined
+    }
+  }
+
+  const scheduleIdleFace = (sequence: number) => {
+    clearFaceResetTimer()
+    faceResetTimerRef.current = setTimeout(() => {
+      if (sequence === responseSequenceRef.current) {
+        setStatus((prev) => ({ ...prev, currentFace: 'idle' }))
+      }
+    }, FACE_HOLD_MS)
+  }
+
+  useEffect(() => clearFaceResetTimer, [])
 
   const setLoading = (next: boolean) => {
     loadingRef.current = next
     setStatus((prev) => ({ ...prev, isLoading: next }))
   }
 
-  const pushAssistantResponse = (text: string, face: AppStatus['currentFace']) => {
+  const pushAssistantResponse = (text: string, face: Face) => {
+    const responseSequence = responseSequenceRef.current + 1
+    responseSequenceRef.current = responseSequence
+    clearFaceResetTimer()
+
     const aiEntry: ChatEntry = {
       id: createId(),
       role: 'assistant',
@@ -63,6 +89,7 @@ export const useChatController = () => {
       connectionStatus: 'connected',
     }))
     if (!status.audioEnabled) {
+      scheduleIdleFace(responseSequence)
       return
     }
 
@@ -72,6 +99,7 @@ export const useChatController = () => {
       },
       onEnd: () => {
         setStatus((prev) => ({ ...prev, isSpeaking: false }))
+        scheduleIdleFace(responseSequence)
       },
       onFallback: (message) => {
         setStatus((prev) => ({ ...prev, errorMessage: message }))
@@ -82,6 +110,7 @@ export const useChatController = () => {
   const setAudioEnabled = (enabled: boolean) => {
     if (!enabled) {
       stopSpeaking()
+      scheduleIdleFace(responseSequenceRef.current)
     }
 
     setStatus((prev) => ({
@@ -100,6 +129,9 @@ export const useChatController = () => {
     if (!value) {
       return
     }
+
+    responseSequenceRef.current += 1
+    clearFaceResetTimer()
 
     const userEntry: ChatEntry = {
       id: createId(),

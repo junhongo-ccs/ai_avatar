@@ -2,6 +2,8 @@ export const FACE_VALUES = ['normal', 'joy', 'sad', 'angry', 'surprised'] as con
 
 export type Face = (typeof FACE_VALUES)[number]
 
+export type DisplayFace = Face | 'idle'
+
 export type AvatarSource = 'dify'
 
 export type AvatarResponse = {

@@ -1,4 +1,4 @@
-import type { Face } from './avatar'
+import type { DisplayFace } from './avatar'
 import type { TtsProvider } from './config'
 
 export type ConnectionStatus = 'connected' | 'misconfigured' | 'error'
@@ -11,5 +11,5 @@ export type AppStatus = {
   isLoading: boolean
   isSpeaking: boolean
   errorMessage?: string
-  currentFace: Face
+  currentFace: DisplayFace
 }

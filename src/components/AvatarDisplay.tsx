@@ -1,7 +1,9 @@
-import type { Face } from '../types/avatar'
+import { useEffect, useRef, useState } from 'react'
+import type { DisplayFace } from '../types/avatar'
 import { getAvatarImagePath } from '../utils/getAvatarImagePath'
 
-const FACE_META: Record<Face, { label: string }> = {
+const FACE_META: Record<DisplayFace, { label: string }> = {
+  idle: { label: 'idle' },
   normal: { label: 'normal' },
   joy: { label: 'joy' },
   sad: { label: 'sad' },
@@ -10,13 +12,50 @@ const FACE_META: Record<Face, { label: string }> = {
 }
 
 type AvatarDisplayProps = {
-  face: Face
+  face: DisplayFace
   isSpeaking: boolean
 }
 
 export const AvatarDisplay = ({ face, isSpeaking }: AvatarDisplayProps) => {
-  const src = getAvatarImagePath(face)
-  const current = FACE_META[face]
+  const [visibleFace, setVisibleFace] = useState(face)
+  const [previousFace, setPreviousFace] = useState<DisplayFace | undefined>(undefined)
+  const [isTransitioning, setIsTransitioning] = useState(false)
+  const visibleFaceRef = useRef(face)
+  const transitionTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const current = FACE_META[visibleFace]
+
+  useEffect(() => {
+    if (face === visibleFaceRef.current) {
+      return
+    }
+
+    if (transitionTimerRef.current) {
+      clearTimeout(transitionTimerRef.current)
+    }
+
+    setPreviousFace(visibleFaceRef.current)
+    visibleFaceRef.current = face
+    setVisibleFace(face)
+    setIsTransitioning(false)
+
+    const animationFrame = requestAnimationFrame(() => setIsTransitioning(true))
+    transitionTimerRef.current = setTimeout(() => {
+      setPreviousFace(undefined)
+      setIsTransitioning(false)
+    }, 500)
+
+    return () => {
+      cancelAnimationFrame(animationFrame)
+      if (transitionTimerRef.current) {
+        clearTimeout(transitionTimerRef.current)
+      }
+    }
+  }, [face])
+
+  const imageClassName = `h-56 w-56 rounded-xl object-cover transition-opacity duration-500 md:h-64 md:w-64 ${
+    isSpeaking ? 'animate-[pulse_3s_ease-in-out_infinite]' : ''
+  }`
+
 
   return (
     <div className="rounded-2xl border border-[rgb(87_121_160)] bg-sky-50 p-5 shadow-sm">
@@ -33,15 +72,23 @@ export const AvatarDisplay = ({ face, isSpeaking }: AvatarDisplayProps) => {
         </span>
       </div>
 
-      <div className="mx-auto w-fit rounded-2xl bg-[oklch(93.2%_0.032_255.585)] p-2">
+      <div className="relative mx-auto w-fit rounded-2xl bg-[oklch(93.2%_0.032_255.585)] p-2">
+        {previousFace ? (
+          <img
+            src={getAvatarImagePath(previousFace)}
+            alt=""
+            aria-hidden="true"
+            className={`absolute ${imageClassName} ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}
+          />
+        ) : null}
         <img
-          src={src}
-          alt={`avatar-${face}`}
-          className={`mx-auto h-56 w-56 rounded-xl object-cover md:h-64 md:w-64 ${
-            isSpeaking ? 'animate-[pulse_3s_ease-in-out_infinite]' : ''
+          src={getAvatarImagePath(visibleFace)}
+          alt={`avatar-${visibleFace}`}
+          className={`relative ${imageClassName} ${
+            previousFace && !isTransitioning ? 'opacity-0' : 'opacity-100'
           }`}
           onError={(event) => {
-            event.currentTarget.src = getAvatarImagePath('normal')
+            event.currentTarget.src = getAvatarImagePath('idle')
           }}
         />
       </div>

@@ -1,11 +1,12 @@
 import type { AppStatus } from '../types/status'
-import type { Face } from '../types/avatar'
+import type { DisplayFace } from '../types/avatar'
 
 type StatusBadgeProps = {
   status: AppStatus
 }
 
-const FACE_LABELS: Record<Face, string> = {
+const FACE_LABELS: Record<DisplayFace, string> = {
+  idle: 'idle',
   normal: 'normal',
   joy: 'joy',
   sad: 'sad',

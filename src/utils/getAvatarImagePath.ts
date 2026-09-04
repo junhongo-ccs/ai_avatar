@@ -1,10 +1,15 @@
-import type { Face } from '../types/avatar'
+import type { DisplayFace } from '../types/avatar'
 
-const FALLBACK_FACE: Face = 'normal'
+const FALLBACK_FACE: DisplayFace = 'idle'
 
-export const getAvatarImagePath = (face: Face | string): string => {
+export const getAvatarImagePath = (face: DisplayFace | string): string => {
   const normalized =
-    face === 'joy' || face === 'sad' || face === 'angry' || face === 'surprised' || face === 'normal'
+    face === 'idle' ||
+    face === 'joy' ||
+    face === 'sad' ||
+    face === 'angry' ||
+    face === 'surprised' ||
+    face === 'normal'
       ? face
       : FALLBACK_FACE
 
