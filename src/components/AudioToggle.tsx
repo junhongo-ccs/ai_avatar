@@ -14,7 +14,7 @@ export const AudioToggle = ({ checked, onChange }: AudioToggleProps) => {
         aria-label="応答音声のオンオフ"
         onClick={() => onChange(!checked)}
         className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
-          checked ? 'bg-[rgb(0_114_225)]' : 'bg-slate-300'
+          checked ? 'bg-[rgb(30_64_175)]' : 'bg-slate-300'
         }`}
       >
         <span

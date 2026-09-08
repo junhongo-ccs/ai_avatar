@@ -44,7 +44,7 @@ export const AvatarDisplay = ({ face, isSpeaking, compact = false }: AvatarDispl
   }, [face])
 
   const imageClassName = `${
-    compact ? 'h-[18dvh] w-[18dvh] max-h-32 max-w-32' : 'h-56 w-56 md:h-64 md:w-64'
+    compact ? 'h-36 w-36' : 'h-56 w-56 md:h-64 md:w-64'
   } rounded-xl object-cover transition-opacity duration-500 ${
     isSpeaking ? 'animate-[pulse_3s_ease-in-out_infinite]' : ''
   }`

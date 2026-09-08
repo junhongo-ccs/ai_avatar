@@ -84,7 +84,7 @@ export const ChatInput = ({
     <div>
       <form onSubmit={submit} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:grid-cols-[minmax(0,1fr)_auto_auto]">
         <input
-          className="min-h-11 w-full rounded-xl border border-[rgb(87_121_160)] bg-white px-3 py-2 text-base focus:border-[rgb(0_83_203)] focus:outline-none focus:ring-2 focus:ring-[rgb(0_83_203)]"
+          className="min-h-11 w-full rounded-xl border border-[rgb(87_121_160)] bg-[rgb(255_255_255)] px-3 py-2 text-base focus:border-[rgb(30_64_175)] focus:outline-none focus:ring-2 focus:ring-[rgb(30_64_175)]"
           value={text}
           onChange={(event) => setText(event.target.value)}
           placeholder="メッセージを入力"
@@ -101,7 +101,7 @@ export const ChatInput = ({
           </button>
         ) : null}
         <button
-          className="min-h-11 rounded-xl bg-[rgb(0_83_203)] px-4 py-2 text-base text-white disabled:cursor-not-allowed disabled:bg-slate-500"
+          className="min-h-11 rounded-xl bg-[#112661] px-4 py-2 text-base text-white shadow-sm transition-colors hover:bg-[#0e1f4d] disabled:cursor-not-allowed disabled:bg-slate-400 disabled:opacity-70"
           type="submit"
           disabled={disabled || text.trim().length === 0}
         >

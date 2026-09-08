@@ -13,7 +13,7 @@ export const ChatLog = ({ entries }: ChatLogProps) => {
   }, [entries])
 
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto rounded-2xl bg-[oklch(93.2%_0.032_255.585)] p-3 md:h-[44vh] md:min-h-[16rem] md:max-h-[34rem] md:flex-none md:p-4 lg:h-auto lg:min-h-0 lg:max-h-none lg:flex-1">
+    <div className="min-h-0 flex-1 overflow-y-auto rounded-2xl bg-[rgb(232_242_251)] p-3 md:h-[44vh] md:min-h-[16rem] md:max-h-[34rem] md:flex-none md:p-4 lg:h-auto lg:min-h-0 lg:max-h-none lg:flex-1">
       <ul className="space-y-3">
         {entries.map((entry) => (
           <li
@@ -29,8 +29,8 @@ export const ChatLog = ({ entries }: ChatLogProps) => {
                   entry.role === 'user'
                     ? 'rounded-br-none bg-[rgb(174_225_254)] text-black'
                     : entry.role === 'assistant'
-                      ? 'rounded-bl-none bg-sky-600 text-white'
-                      : 'rounded-bl-none bg-sky-600 text-white'
+                      ? 'rounded-bl-none bg-[#0072bc] text-white'
+                      : 'rounded-bl-none bg-[#0072bc] text-white'
                 }`}
               >
                 {entry.text}

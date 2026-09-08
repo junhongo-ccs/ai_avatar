@@ -16,15 +16,18 @@ export const App = () => {
   return (
     <main className="mx-auto flex h-dvh w-full max-w-[1600px] flex-col overflow-hidden px-3 py-3 md:min-h-dvh md:h-auto md:px-6 md:py-6 md:overflow-visible lg:h-dvh lg:overflow-hidden">
       <header className="mb-3 flex h-[20dvh] shrink-0 items-center justify-between gap-3 md:mb-4 md:h-auto md:flex-row md:items-start">
-        <div className="min-w-0">
-          <h1 className="flex items-center gap-2 text-base font-bold text-white md:text-2xl">
+        <div className="min-w-0 flex-1 md:flex-none">
+          <h1 className="flex items-center gap-2 text-xl font-bold text-white md:text-2xl">
             <img
               src={communicationIcon}
               alt=""
               aria-hidden="true"
-              className="h-8 w-8 shrink-0 translate-y-0.5 md:h-12 md:w-12"
+              className="hidden h-8 w-8 shrink-0 translate-y-0.5 md:block md:h-12 md:w-12"
             />
-            CCS人事センパイに聞いてみよう
+            <span className="min-w-0 leading-tight">
+              <span className="block md:inline">CCS人事センパイに</span>
+              <span className="block md:inline">聞いてみよう</span>
+            </span>
           </h1>
         </div>
         <div className="md:hidden">
