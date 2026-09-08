@@ -203,4 +203,32 @@ describe('useChatController', () => {
 
     expect(stopSpeakingMock).toHaveBeenCalledTimes(1)
   })
+
+  it('does not speak when audio output is disallowed', async () => {
+    envState.mode = 'connected'
+    sendMessageToDifyMock.mockResolvedValueOnce({
+      answer: '{"face":"joy","text":"mobile silent"}',
+      conversation_id: 'conv-mobile',
+    })
+
+    const { result } = renderHook(() => useChatController({ audioOutputAllowed: false }))
+
+    await act(async () => {
+      await result.current.handleSend('first')
+    })
+
+    expect(speakTextMock).not.toHaveBeenCalled()
+  })
+
+  it('stops speech when audio output becomes disallowed', () => {
+    envState.mode = 'connected'
+    const { rerender } = renderHook(
+      ({ audioOutputAllowed }) => useChatController({ audioOutputAllowed }),
+      { initialProps: { audioOutputAllowed: true } },
+    )
+
+    rerender({ audioOutputAllowed: false })
+
+    expect(stopSpeakingMock).toHaveBeenCalledTimes(1)
+  })
 })

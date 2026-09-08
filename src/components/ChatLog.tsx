@@ -13,7 +13,7 @@ export const ChatLog = ({ entries }: ChatLogProps) => {
   }, [entries])
 
   return (
-    <div className="h-[44vh] min-h-[16rem] max-h-[34rem] overflow-y-auto rounded-2xl bg-[oklch(93.2%_0.032_255.585)] p-4 lg:h-auto lg:min-h-0 lg:max-h-none lg:flex-1">
+    <div className="min-h-0 flex-1 overflow-y-auto rounded-2xl bg-[oklch(93.2%_0.032_255.585)] p-3 md:h-[44vh] md:min-h-[16rem] md:max-h-[34rem] md:flex-none md:p-4 lg:h-auto lg:min-h-0 lg:max-h-none lg:flex-1">
       <ul className="space-y-3">
         {entries.map((entry) => (
           <li
@@ -25,7 +25,7 @@ export const ChatLog = ({ entries }: ChatLogProps) => {
                 <span>{entry.role === 'user' ? 'あなた' : 'CCS人事'}</span>
               </p>
               <p
-                className={`rounded-2xl px-4 py-2 text-sm leading-relaxed ${
+                className={`rounded-2xl px-4 py-2 text-base leading-relaxed ${
                   entry.role === 'user'
                     ? 'rounded-br-none bg-[rgb(174_225_254)] text-black'
                     : entry.role === 'assistant'

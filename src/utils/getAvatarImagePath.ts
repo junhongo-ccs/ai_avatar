@@ -13,5 +13,5 @@ export const getAvatarImagePath = (face: DisplayFace | string): string => {
       ? face
       : FALLBACK_FACE
 
-  return `/avatar/${normalized}.png`
+  return `/avatar/${normalized}.webp`
 }

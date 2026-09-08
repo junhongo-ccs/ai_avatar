@@ -79,4 +79,21 @@ describe('ChatInput with speech recognition', () => {
       expect(onSend).toHaveBeenCalledWith('手入力メッセージ')
     })
   })
+
+  it('hides all speech controls while keeping text send available', async () => {
+    const onSend = vi.fn().mockResolvedValue(undefined)
+
+    render(<ChatInput speechInputEnabled={false} onSend={onSend} />)
+
+    expect(screen.queryByRole('button', { name: 'マイク入力開始' })).toBeNull()
+    expect(screen.queryByText(/音声入力:/)).toBeNull()
+
+    const input = screen.getByPlaceholderText('メッセージを入力')
+    fireEvent.change(input, { target: { value: 'テキストで質問します' } })
+    fireEvent.click(screen.getByRole('button', { name: '送信' }))
+
+    await waitFor(() => {
+      expect(onSend).toHaveBeenCalledWith('テキストで質問します')
+    })
+  })
 })

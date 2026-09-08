@@ -18,7 +18,11 @@ const initialMessageByConnectionStatus = {
   error: '通信エラーが発生しています。再送信を試してください。',
 } as const
 
-export const useChatController = () => {
+type UseChatControllerOptions = {
+  audioOutputAllowed?: boolean
+}
+
+export const useChatController = ({ audioOutputAllowed = true }: UseChatControllerOptions = {}) => {
   const config = getDifyConfig()
   const envConnectionStatus = getDifyConnectionStatus(config)
   const ttsProvider = getTtsProvider()
@@ -42,8 +46,11 @@ export const useChatController = () => {
   })
   const [conversationId, setConversationId] = useState<string | undefined>(undefined)
   const loadingRef = useRef(false)
+  const audioOutputAllowedRef = useRef(audioOutputAllowed)
   const faceResetTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const responseSequenceRef = useRef(0)
+
+  audioOutputAllowedRef.current = audioOutputAllowed
 
   const clearFaceResetTimer = () => {
     if (faceResetTimerRef.current) {
@@ -62,6 +69,15 @@ export const useChatController = () => {
   }
 
   useEffect(() => clearFaceResetTimer, [])
+
+  useEffect(() => {
+    if (audioOutputAllowed) {
+      return
+    }
+
+    stopSpeaking()
+    setStatus((prev) => ({ ...prev, isSpeaking: false }))
+  }, [audioOutputAllowed])
 
   const setLoading = (next: boolean) => {
     loadingRef.current = next
@@ -89,7 +105,7 @@ export const useChatController = () => {
       errorMessage: undefined,
       connectionStatus: 'connected',
     }))
-    if (!status.audioEnabled) {
+    if (!status.audioEnabled || !audioOutputAllowedRef.current) {
       scheduleIdleFace(responseSequence, SILENT_FACE_HOLD_MS)
       return
     }
