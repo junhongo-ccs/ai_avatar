@@ -118,6 +118,38 @@ describe('useChatController', () => {
     expect(result.current.status.currentFace).toBe('normal')
   })
 
+  it('returns to idle while waiting for the next response', async () => {
+    envState.mode = 'connected'
+    sendMessageToDifyMock.mockResolvedValueOnce({
+      answer: '{"face":"joy","text":"first"}',
+      conversation_id: 'conv-1',
+    })
+    let resolveDify: ((value: { answer: string; conversation_id: string }) => void) | undefined
+    sendMessageToDifyMock.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveDify = resolve
+        }),
+    )
+
+    const { result } = renderHook(() => useChatController())
+
+    await act(async () => {
+      await result.current.handleSend('first')
+    })
+    expect(result.current.status.currentFace).toBe('joy')
+
+    act(() => {
+      void result.current.handleSend('second')
+    })
+    expect(result.current.status.currentFace).toBe('idle')
+
+    await act(async () => {
+      resolveDify?.({ answer: '{"face":"normal","text":"second"}', conversation_id: 'conv-1' })
+      await Promise.resolve()
+    })
+  })
+
   it('misconfigured does not call API', async () => {
     envState.mode = 'misconfigured'
 

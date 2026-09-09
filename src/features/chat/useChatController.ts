@@ -163,6 +163,7 @@ export const useChatController = ({ audioOutputAllowed = true }: UseChatControll
       ...prev,
       errorMessage: undefined,
       connectionStatus: 'connected',
+      currentFace: 'idle',
     }))
 
     if (status.connectionStatus === 'misconfigured') {
