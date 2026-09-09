@@ -40,8 +40,8 @@ export const App = () => {
 
       <section className="flex min-h-0 flex-1 flex-col gap-3 md:grid md:grid-cols-1 md:gap-4 lg:grid-cols-[minmax(280px,340px)_minmax(0,1fr)] lg:items-stretch lg:overflow-hidden">
         <aside className="hidden space-y-3 md:block lg:sticky lg:top-4 lg:min-h-0 lg:self-start lg:overflow-y-auto lg:pr-1">
-          <StatusBadge status={status} />
           <AvatarDisplay face={status.currentFace} isSpeaking={status.isSpeaking} />
+          <StatusBadge status={status} />
         </aside>
 
         <section className="flex min-h-0 min-w-0 flex-1 flex-col rounded-2xl border border-[rgb(87_121_160)] bg-white p-3 sm:p-4 md:block md:flex-none lg:flex lg:h-full lg:flex-1 lg:flex-col">
