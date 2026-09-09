@@ -2,7 +2,7 @@ import type { DisplayFace } from '../types/avatar'
 
 const FALLBACK_FACE: DisplayFace = 'idle'
 
-export const getAvatarImagePath = (face: DisplayFace | string): string => {
+export const getAvatarImagePath = (face: DisplayFace | string, blink = false): string => {
   const normalized =
     face === 'idle' ||
     face === 'joy' ||
@@ -13,5 +13,7 @@ export const getAvatarImagePath = (face: DisplayFace | string): string => {
       ? face
       : FALLBACK_FACE
 
-  return `/avatar/${normalized}.webp`
+  const variant = blink && normalized === 'idle' ? 'idle-blink' : normalized
+
+  return `/avatar/${variant}.webp`
 }
