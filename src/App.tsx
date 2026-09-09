@@ -39,7 +39,7 @@ export const App = () => {
       </header>
 
       <section className="flex min-h-0 flex-1 flex-col gap-3 md:grid md:grid-cols-1 md:gap-4 lg:grid-cols-[minmax(280px,340px)_minmax(0,1fr)] lg:items-stretch lg:overflow-hidden">
-        <aside className="hidden space-y-3 md:block lg:sticky lg:top-4 lg:min-h-0 lg:self-start lg:overflow-y-auto lg:pr-1">
+        <aside className="hidden space-y-3 md:block lg:sticky lg:top-0 lg:min-h-0 lg:self-start lg:overflow-y-auto lg:pr-1">
           <AvatarDisplay face={status.currentFace} isSpeaking={status.isSpeaking} />
           <StatusBadge status={status} />
         </aside>
