@@ -150,6 +150,22 @@ describe('useChatController', () => {
     })
   })
 
+  it('adds Dify messages as separate assistant entries', async () => {
+    envState.mode = 'connected'
+    sendMessageToDifyMock.mockResolvedValueOnce({
+      answer: '{"face":"normal","messages":["1つ目の回答","2つ目の回答"]}',
+      conversation_id: 'conv-1',
+    })
+    const { result } = renderHook(() => useChatController())
+
+    await act(async () => {
+      await result.current.handleSend('質問')
+    })
+
+    expect(result.current.entries.filter((entry) => entry.role === 'assistant').map((entry) => entry.text))
+      .toEqual(['1つ目の回答', '2つ目の回答'])
+  })
+
   it('misconfigured does not call API', async () => {
     envState.mode = 'misconfigured'
 

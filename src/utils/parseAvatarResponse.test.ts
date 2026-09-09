@@ -15,6 +15,13 @@ describe('parseAvatarResponse', () => {
     expect(result.text).toBe('こんにちは')
   })
 
+  it('parses each messages item for separate chat bubbles', () => {
+    const result = parseAvatarResponse('{"face":"joy","messages":["こんにちは","お手伝いします。"]}')
+    expect(result.face).toBe('joy')
+    expect(result.messages).toEqual(['こんにちは', 'お手伝いします。'])
+    expect(result.text).toBe('こんにちは お手伝いします。')
+  })
+
   it('falls back face and text safely when invalid', () => {
     const result = parseAvatarResponse('{"face":"unknown","text":""}', {
       source: 'dify',

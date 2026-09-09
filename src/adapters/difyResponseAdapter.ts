@@ -24,6 +24,7 @@ export const adaptDifyResponse = (raw: unknown): AdaptedDifyResult => {
       avatar: {
         face: 'normal',
         text: SAFE_TEXT,
+        messages: [SAFE_TEXT],
         raw: String(raw),
         source: 'dify',
       },
@@ -43,6 +44,7 @@ export const adaptDifyResponse = (raw: unknown): AdaptedDifyResult => {
       ...parsed,
       face: asSafeFace(parsed.face),
       text: parsed.text.trim() || SAFE_TEXT,
+      messages: parsed.messages.length > 0 ? parsed.messages : [SAFE_TEXT],
     },
     conversationId,
   }

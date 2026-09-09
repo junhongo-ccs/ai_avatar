@@ -18,6 +18,7 @@ export type AvatarSource = 'dify'
 export type AvatarResponse = {
   face: Face
   text: string
+  messages: string[]
   raw: string
   source: AvatarSource
 }

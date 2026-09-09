@@ -14,6 +14,7 @@ describe('adaptDifyResponse', () => {
     expect(adapted.avatar).toEqual({
       face: 'joy',
       text: 'hello',
+      messages: ['hello'],
       raw: '{"face":"joy","text":"hello"}',
       source: 'dify',
     })
@@ -32,5 +33,14 @@ describe('adaptDifyResponse', () => {
   it('falls back unknown face to normal', () => {
     const adapted = adaptDifyResponse({ answer: '{"face":"mystery","text":"ok"}' })
     expect(adapted.avatar.face).toBe('normal')
+  })
+
+  it('keeps a Dify messages array for individual chat bubbles', () => {
+    const adapted = adaptDifyResponse({
+      answer: '{"face":"normal","messages":["1つ目","2つ目"]}',
+    })
+
+    expect(adapted.avatar.messages).toEqual(['1つ目', '2つ目'])
+    expect(adapted.avatar.text).toBe('1つ目 2つ目')
   })
 })

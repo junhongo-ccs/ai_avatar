@@ -84,20 +84,21 @@ export const useChatController = ({ audioOutputAllowed = true }: UseChatControll
     setStatus((prev) => ({ ...prev, isLoading: next }))
   }
 
-  const pushAssistantResponse = (text: string, face: Face) => {
+  const pushAssistantResponse = (messages: string[], face: Face) => {
     const responseSequence = responseSequenceRef.current + 1
     responseSequenceRef.current = responseSequence
     clearFaceResetTimer()
 
-    const aiEntry: ChatEntry = {
+    const responseText = messages.join(' ')
+    const aiEntries: ChatEntry[] = messages.map((text, index) => ({
       id: createId(),
       role: 'assistant',
       text,
       face,
-      timestamp: Date.now(),
-    }
+      timestamp: Date.now() + index,
+    }))
 
-    setEntries((prev) => [...prev, aiEntry])
+    setEntries((prev) => [...prev, ...aiEntries])
     setLoading(false)
     setStatus((prev) => ({
       ...prev,
@@ -110,7 +111,7 @@ export const useChatController = ({ audioOutputAllowed = true }: UseChatControll
       return
     }
 
-    speakText(text, status.ttsProvider, {
+    speakText(responseText, status.ttsProvider, {
       onStart: () => {
         setStatus((prev) => ({ ...prev, isSpeaking: true }))
       },
@@ -183,7 +184,7 @@ export const useChatController = ({ audioOutputAllowed = true }: UseChatControll
       if (adapted.conversationId) {
         setConversationId(adapted.conversationId)
       }
-      pushAssistantResponse(adapted.avatar.text, adapted.avatar.face)
+      pushAssistantResponse(adapted.avatar.messages, adapted.avatar.face)
     } catch {
       setLoading(false)
       setStatus((prev) => ({

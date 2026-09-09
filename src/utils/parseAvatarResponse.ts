@@ -4,6 +4,7 @@ import { extractFaceTag } from './extractFaceTag'
 type RawAvatarJson = {
   face?: string
   text?: string
+  messages?: unknown
 }
 
 const asFace = (face: string | undefined) => {
@@ -25,10 +26,28 @@ export const parseAvatarResponse = (raw: string, options?: ParseOptions): Avatar
 
   try {
     const parsed = JSON.parse(trimmed) as RawAvatarJson
+    if (Array.isArray(parsed.messages)) {
+      const messages = parsed.messages
+        .filter((message): message is string => typeof message === 'string')
+        .map((message) => message.trim())
+        .filter(Boolean)
+
+      if (messages.length > 0) {
+        return {
+          face: asFace(parsed.face),
+          text: messages.join(' '),
+          messages,
+          raw,
+          source,
+        }
+      }
+    }
     if (typeof parsed.text === 'string') {
+      const text = parsed.text.trim() || fallbackText
       return {
         face: asFace(parsed.face),
-        text: parsed.text.trim() || fallbackText,
+        text,
+        messages: [text],
         raw,
         source,
       }
@@ -41,6 +60,7 @@ export const parseAvatarResponse = (raw: string, options?: ParseOptions): Avatar
   return {
     face: fromTag.face,
     text: fromTag.text.trim() || fallbackText,
+    messages: [fromTag.text.trim() || fallbackText],
     raw,
     source,
   }
