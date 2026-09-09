@@ -9,7 +9,7 @@ type AvatarDisplayProps = {
 }
 
 const BLINK_INTERVAL_MS = 4500
-const BLINK_DURATION_MS = 280
+const BLINK_DURATION_MS = 180
 
 export const AvatarDisplay = ({ face, isSpeaking, compact = false }: AvatarDisplayProps) => {
   const [visibleFace, setVisibleFace] = useState(face)
