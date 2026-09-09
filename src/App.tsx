@@ -15,7 +15,10 @@ export const App = () => {
 
   return (
     <main className="mx-auto flex h-dvh w-full max-w-[1600px] flex-col overflow-hidden px-3 py-3 md:min-h-dvh md:h-auto md:px-6 md:py-6 md:overflow-visible lg:h-dvh lg:overflow-hidden">
-      <header className="mb-3 flex h-[20dvh] shrink-0 items-center justify-between gap-3 md:mb-4 md:h-auto md:flex-row md:items-start">
+      <header className="mb-3 flex h-[20dvh] shrink-0 items-center justify-between gap-[24px] md:mb-4 md:h-auto md:flex-row md:items-start">
+        <div className="md:hidden">
+          <AvatarDisplay face={status.currentFace} isSpeaking={status.isSpeaking} compact />
+        </div>
         <div className="min-w-0 flex-1 md:flex-none">
           <h1 className="flex items-center gap-2 text-xl font-bold text-white md:text-2xl">
             <img
@@ -29,9 +32,6 @@ export const App = () => {
               <span className="block md:inline">聞いてみよう</span>
             </span>
           </h1>
-        </div>
-        <div className="md:hidden">
-          <AvatarDisplay face={status.currentFace} isSpeaking={status.isSpeaking} compact />
         </div>
         <div className="hidden md:block">
           <AudioToggle checked={status.audioEnabled} onChange={setAudioEnabled} />

@@ -29,8 +29,8 @@ export const ChatLog = ({ entries }: ChatLogProps) => {
                   entry.role === 'user'
                     ? 'rounded-br-none bg-[rgb(174_225_254)] text-black'
                     : entry.role === 'assistant'
-                      ? 'rounded-bl-none bg-[#0072bc] text-white'
-                      : 'rounded-bl-none bg-[#0072bc] text-white'
+                      ? 'rounded-tl-none bg-[#0072bc] text-white'
+                      : 'rounded-tl-none bg-[#0072bc] text-white'
                 }`}
               >
                 {entry.text}
