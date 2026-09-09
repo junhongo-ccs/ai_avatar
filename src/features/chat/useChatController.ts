@@ -9,7 +9,7 @@ import type { AppStatus } from '../../types/status'
 
 const createId = () => `${Date.now()}-${Math.random().toString(16).slice(2)}`
 const SPOKEN_FACE_HOLD_MS = 1500
-const SILENT_FACE_HOLD_MS = 10000
+const SILENT_FACE_HOLD_MS = 1500
 
 const initialMessageByConnectionStatus = {
   connected:
