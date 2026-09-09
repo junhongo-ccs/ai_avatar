@@ -10,6 +10,7 @@ import type { AppStatus } from '../../types/status'
 const createId = () => `${Date.now()}-${Math.random().toString(16).slice(2)}`
 const SPOKEN_FACE_HOLD_MS = 1500
 const SILENT_FACE_HOLD_MS = 1500
+const MESSAGE_BUBBLE_DELAY_MS = 1000
 
 const initialMessageByConnectionStatus = {
   connected:
@@ -48,6 +49,8 @@ export const useChatController = ({ audioOutputAllowed = true }: UseChatControll
   const loadingRef = useRef(false)
   const audioOutputAllowedRef = useRef(audioOutputAllowed)
   const faceResetTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const messageTimerRefs = useRef<ReturnType<typeof setTimeout>[]>([])
+  const pendingAssistantEntriesRef = useRef<ChatEntry[]>([])
   const responseSequenceRef = useRef(0)
 
   audioOutputAllowedRef.current = audioOutputAllowed
@@ -56,6 +59,20 @@ export const useChatController = ({ audioOutputAllowed = true }: UseChatControll
     if (faceResetTimerRef.current) {
       clearTimeout(faceResetTimerRef.current)
       faceResetTimerRef.current = undefined
+    }
+  }
+
+  const clearMessageTimers = () => {
+    messageTimerRefs.current.forEach(clearTimeout)
+    messageTimerRefs.current = []
+  }
+
+  const flushPendingAssistantEntries = () => {
+    clearMessageTimers()
+    const pendingEntries = pendingAssistantEntriesRef.current
+    pendingAssistantEntriesRef.current = []
+    if (pendingEntries.length > 0) {
+      setEntries((prev) => [...prev, ...pendingEntries])
     }
   }
 
@@ -68,7 +85,10 @@ export const useChatController = ({ audioOutputAllowed = true }: UseChatControll
     }, delayMs)
   }
 
-  useEffect(() => clearFaceResetTimer, [])
+  useEffect(() => () => {
+    clearFaceResetTimer()
+    clearMessageTimers()
+  }, [])
 
   useEffect(() => {
     if (audioOutputAllowed) {
@@ -88,6 +108,7 @@ export const useChatController = ({ audioOutputAllowed = true }: UseChatControll
     const responseSequence = responseSequenceRef.current + 1
     responseSequenceRef.current = responseSequence
     clearFaceResetTimer()
+    flushPendingAssistantEntries()
 
     const responseText = messages.join(' ')
     const aiEntries: ChatEntry[] = messages.map((text, index) => ({
@@ -98,7 +119,25 @@ export const useChatController = ({ audioOutputAllowed = true }: UseChatControll
       timestamp: Date.now() + index,
     }))
 
-    setEntries((prev) => [...prev, ...aiEntries])
+    const [firstEntry, ...remainingEntries] = aiEntries
+    if (firstEntry) {
+      setEntries((prev) => [...prev, firstEntry])
+    }
+    pendingAssistantEntriesRef.current = remainingEntries
+    remainingEntries.forEach((entry, index) => {
+      const timer = setTimeout(() => {
+        if (responseSequence !== responseSequenceRef.current) {
+          return
+        }
+        const pendingEntries = pendingAssistantEntriesRef.current
+        if (!pendingEntries.some((pendingEntry) => pendingEntry.id === entry.id)) {
+          return
+        }
+        pendingAssistantEntriesRef.current = pendingEntries.filter((pendingEntry) => pendingEntry.id !== entry.id)
+        setEntries((prev) => [...prev, entry])
+      }, (index + 1) * MESSAGE_BUBBLE_DELAY_MS)
+      messageTimerRefs.current.push(timer)
+    })
     setLoading(false)
     setStatus((prev) => ({
       ...prev,
@@ -150,6 +189,7 @@ export const useChatController = ({ audioOutputAllowed = true }: UseChatControll
 
     responseSequenceRef.current += 1
     clearFaceResetTimer()
+    flushPendingAssistantEntries()
 
     const userEntry: ChatEntry = {
       id: createId(),

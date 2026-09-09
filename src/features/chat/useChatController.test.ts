@@ -151,6 +151,7 @@ describe('useChatController', () => {
   })
 
   it('adds Dify messages as separate assistant entries', async () => {
+    vi.useFakeTimers()
     envState.mode = 'connected'
     sendMessageToDifyMock.mockResolvedValueOnce({
       answer: '{"face":"normal","messages":["1つ目の回答","2つ目の回答"]}',
@@ -158,12 +159,54 @@ describe('useChatController', () => {
     })
     const { result } = renderHook(() => useChatController())
 
-    await act(async () => {
-      await result.current.handleSend('質問')
-    })
+    try {
+      await act(async () => {
+        await result.current.handleSend('質問')
+      })
+      expect(result.current.entries.filter((entry) => entry.role === 'assistant').map((entry) => entry.text))
+        .toEqual(['1つ目の回答'])
 
-    expect(result.current.entries.filter((entry) => entry.role === 'assistant').map((entry) => entry.text))
-      .toEqual(['1つ目の回答', '2つ目の回答'])
+      act(() => {
+        vi.advanceTimersByTime(1000)
+      })
+      expect(result.current.entries.filter((entry) => entry.role === 'assistant').map((entry) => entry.text))
+        .toEqual(['1つ目の回答', '2つ目の回答'])
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('flushes delayed bubbles before sending the next question', async () => {
+    vi.useFakeTimers()
+    envState.mode = 'connected'
+    sendMessageToDifyMock
+      .mockResolvedValueOnce({
+        answer: '{"face":"normal","messages":["1つ目","2つ目","3つ目"]}',
+        conversation_id: 'conv-1',
+      })
+      .mockResolvedValueOnce({ answer: '{"face":"normal","text":"次の回答"}', conversation_id: 'conv-1' })
+    const { result } = renderHook(() => useChatController())
+
+    try {
+      await act(async () => {
+        await result.current.handleSend('最初の質問')
+      })
+      await act(async () => {
+        await result.current.handleSend('次の質問')
+      })
+
+      expect(result.current.entries.map((entry) => entry.text)).toEqual([
+        expect.any(String),
+        '最初の質問',
+        '1つ目',
+        '2つ目',
+        '3つ目',
+        '次の質問',
+        '次の回答',
+      ])
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('misconfigured does not call API', async () => {
