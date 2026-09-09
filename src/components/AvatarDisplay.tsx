@@ -8,6 +8,9 @@ type AvatarDisplayProps = {
   compact?: boolean
 }
 
+const BLINK_INTERVAL_MS = 4500
+const BLINK_DURATION_MS = 280
+
 export const AvatarDisplay = ({ face, isSpeaking, compact = false }: AvatarDisplayProps) => {
   const [visibleFace, setVisibleFace] = useState(face)
   const [previousFace, setPreviousFace] = useState<DisplayFace | undefined>(undefined)
@@ -47,7 +50,7 @@ export const AvatarDisplay = ({ face, isSpeaking, compact = false }: AvatarDispl
   }, [face])
 
   useEffect(() => {
-    if (face !== 'idle' || isSpeaking) {
+    if (face !== 'idle') {
       setBlinkActive(false)
       if (blinkTimerRef.current) {
         clearInterval(blinkTimerRef.current)
@@ -67,8 +70,8 @@ export const AvatarDisplay = ({ face, isSpeaking, compact = false }: AvatarDispl
       }
       blinkTimeoutRef.current = setTimeout(() => {
         setBlinkActive(false)
-      }, 130)
-    }, 6000)
+      }, BLINK_DURATION_MS)
+    }, BLINK_INTERVAL_MS)
 
     return () => {
       if (blinkTimerRef.current) {
@@ -80,7 +83,7 @@ export const AvatarDisplay = ({ face, isSpeaking, compact = false }: AvatarDispl
         blinkTimeoutRef.current = undefined
       }
     }
-  }, [face, isSpeaking])
+  }, [face])
 
   const imageClassName = `${
     compact ? 'h-36 w-36' : 'h-56 w-56 md:h-64 md:w-64'
@@ -89,7 +92,7 @@ export const AvatarDisplay = ({ face, isSpeaking, compact = false }: AvatarDispl
   }`
 
   const currentImagePath =
-    face === 'idle' && !isSpeaking && blinkActive ? getAvatarImagePath(face, true) : getAvatarImagePath(face)
+    face === 'idle' && blinkActive ? getAvatarImagePath(face, true) : getAvatarImagePath(face)
 
   return (
     <div className={compact ? 'shrink-0' : 'rounded-2xl border border-[rgb(87_121_160)] bg-sky-50 p-5 shadow-sm'}>
