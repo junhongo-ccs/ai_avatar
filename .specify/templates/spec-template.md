@@ -90,6 +90,13 @@
 - **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
 - **FR-005**: System MUST [behavior, e.g., "log all security events"]
 
+### Mobile Experience Requirements *(mandatory for event-facing features)*
+
+- **MOB-001**: [Describe how the primary smartphone user journey completes the
+  feature through text input and response reading, without audio input or output.]
+- **MOB-002**: [Describe how the feature will be validated in a representative
+  smartphone viewport, including that audio controls are not exposed.]
+
 *Example of marking unclear requirements:*
 
 - **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
@@ -123,6 +130,6 @@
 -->
 
 - [Assumption about target users, e.g., "Users have stable internet connectivity"]
-- [Assumption about scope boundaries, e.g., "Mobile support is out of scope for v1"]
+- [Assumption about target device, e.g., "Students use smartphones at an event"]
 - [Assumption about data/environment, e.g., "Existing authentication system will be reused"]
 - [Dependency on existing system/service, e.g., "Requires access to the existing user profile API"]

@@ -48,6 +48,26 @@ describe('VOICEVOX backend route', () => {
     expect(response.status).toBe(200)
   })
 
+  it('rejects invalid basic auth credentials of matching and different lengths', async () => {
+    const app = createApp({
+      fetchImpl: vi.fn(),
+      basicAuthUser: 'demo',
+      basicAuthPassword: 'secret',
+    })
+
+    const sameLength = await request(app)
+      .post('/api/tts/voicevox')
+      .auth('demo', 'secrex')
+      .send({ text: 'hello' })
+    const differentLength = await request(app)
+      .post('/api/tts/voicevox')
+      .auth('d', 'x')
+      .send({ text: 'hello' })
+
+    expect(sameLength.status).toBe(401)
+    expect(differentLength.status).toBe(401)
+  })
+
   it('returns 400 when text is missing', async () => {
     const app = createApp({ fetchImpl: vi.fn() })
     const response = await request(app).post('/api/tts/voicevox').send({ text: '   ' })

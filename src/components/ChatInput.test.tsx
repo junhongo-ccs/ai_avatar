@@ -23,9 +23,9 @@ class RecognitionMock {
     this.onstart?.()
   }
 
-  stop() {
+  stop = vi.fn(() => {
     this.onend?.()
-  }
+  })
 }
 
 describe('ChatInput with speech recognition', () => {
@@ -95,5 +95,16 @@ describe('ChatInput with speech recognition', () => {
     await waitFor(() => {
       expect(onSend).toHaveBeenCalledWith('テキストで質問します')
     })
+  })
+
+  it('stops recognition when speech input is disabled', () => {
+    window.SpeechRecognition = RecognitionMock as never
+    const onSend = vi.fn().mockResolvedValue(undefined)
+    const { rerender } = render(<ChatInput onSend={onSend} />)
+    const recognition = RecognitionMock.lastInstance
+
+    rerender(<ChatInput speechInputEnabled={false} onSend={onSend} />)
+
+    expect(recognition?.stop).toHaveBeenCalledTimes(1)
   })
 })

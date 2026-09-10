@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import {
   createSpeechRecognitionController,
   isSpeechRecognitionSupported,
+  type SpeechRecognitionController,
 } from '../services/speechRecognitionService'
 
 type ChatInputProps = {
@@ -18,43 +19,44 @@ export const ChatInput = ({
   const [text, setText] = useState('')
   const [isListening, setIsListening] = useState(false)
   const [recognitionError, setRecognitionError] = useState<string | undefined>(undefined)
+  const recognitionRef = useRef<SpeechRecognitionController | null>(null)
 
   const speechSupported = useMemo(
     () => speechInputEnabled && isSpeechRecognitionSupported(),
     [speechInputEnabled],
   )
 
-  const recognition = useMemo(
-    () => {
-      if (!speechInputEnabled) {
-        return null
-      }
-
-      return createSpeechRecognitionController({
-        lang: 'ja-JP',
-        onStart: () => {
-          setIsListening(true)
-          setRecognitionError(undefined)
-        },
-        onEnd: () => setIsListening(false),
-        onError: () => {
-          setIsListening(false)
-          setRecognitionError('音声認識に失敗しました。もう一度お試しください。')
-        },
-        onResult: (transcript) => {
-          setText(transcript)
-          setRecognitionError(undefined)
-        },
-      })
-    },
-    [speechInputEnabled],
-  )
-
   useEffect(() => {
-    return () => {
-      recognition?.stop()
+    if (!speechInputEnabled) {
+      recognitionRef.current = null
+      return
     }
-  }, [recognition])
+
+    const recognition = createSpeechRecognitionController({
+      lang: 'ja-JP',
+      onStart: () => {
+        setIsListening(true)
+        setRecognitionError(undefined)
+      },
+      onEnd: () => setIsListening(false),
+      onError: () => {
+        setIsListening(false)
+        setRecognitionError('音声認識に失敗しました。もう一度お試しください。')
+      },
+      onResult: (transcript) => {
+        setText(transcript)
+        setRecognitionError(undefined)
+      },
+    })
+    recognitionRef.current = recognition
+
+    return () => {
+      recognition.stop()
+      if (recognitionRef.current === recognition) {
+        recognitionRef.current = null
+      }
+    }
+  }, [speechInputEnabled])
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -68,6 +70,7 @@ export const ChatInput = ({
   }
 
   const toggleListening = () => {
+    const recognition = recognitionRef.current
     if (!speechSupported || disabled || !recognition) {
       return
     }

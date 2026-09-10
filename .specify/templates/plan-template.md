@@ -33,6 +33,11 @@
 
 [Gates determined based on constitution file]
 
+For event-facing features, document the primary text-based smartphone user journey,
+the representative viewport used for validation, and any desktop-first trade-off
+that could affect that journey. The smartphone journey MUST NOT require or expose
+audio input or output.
+
 ## Project Structure
 
 ### Documentation (this feature)

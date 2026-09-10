@@ -152,9 +152,19 @@ export const useChatController = ({ audioOutputAllowed = true }: UseChatControll
 
     speakText(responseText, status.ttsProvider, {
       onStart: () => {
-        setStatus((prev) => ({ ...prev, isSpeaking: true }))
+        if (responseSequence !== responseSequenceRef.current) {
+          return
+        }
+        // VOICEVOX playback can fail before browser fallback begins. Its onEnd
+        // schedules an idle reset, so cancel that reset and restore the response
+        // face once fallback playback actually starts.
+        clearFaceResetTimer()
+        setStatus((prev) => ({ ...prev, isSpeaking: true, currentFace: face }))
       },
       onEnd: () => {
+        if (responseSequence !== responseSequenceRef.current) {
+          return
+        }
         setStatus((prev) => ({ ...prev, isSpeaking: false }))
         scheduleIdleFace(responseSequence)
       },

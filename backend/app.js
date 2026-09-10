@@ -1,4 +1,5 @@
 import express from 'express'
+import { timingSafeEqual } from 'node:crypto'
 
 const parseSpeaker = (value, fallback) => {
   const parsed = Number.parseInt(value ?? '', 10)
@@ -26,6 +27,16 @@ const readBasicCredentials = (header) => {
   }
 }
 
+const isTimingSafeEqual = (value, expected) => {
+  const valueBuffer = Buffer.from(value)
+  const expectedBuffer = Buffer.from(expected)
+  const sameLength = valueBuffer.length === expectedBuffer.length
+  // Compare an equal-length dummy value when the supplied value has a different
+  // length so authentication always performs a timing-safe comparison.
+  const comparedBuffer = sameLength ? valueBuffer : expectedBuffer
+  return timingSafeEqual(comparedBuffer, expectedBuffer) && sameLength
+}
+
 export const createApp = ({
   fetchImpl = fetch,
   engineUrl,
@@ -41,7 +52,9 @@ export const createApp = ({
   if (authEnabled) {
     app.use((req, res, next) => {
       const credentials = readBasicCredentials(req.headers.authorization)
-      if (credentials?.user === authUser && credentials.password === authPassword) {
+      const validUser = isTimingSafeEqual(credentials?.user ?? '', authUser)
+      const validPassword = isTimingSafeEqual(credentials?.password ?? '', authPassword)
+      if (validUser && validPassword) {
         return next()
       }
 

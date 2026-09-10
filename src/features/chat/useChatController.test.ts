@@ -295,6 +295,38 @@ describe('useChatController', () => {
     expect(stopSpeakingMock).toHaveBeenCalledTimes(1)
   })
 
+  it('keeps the response face while a browser fallback starts after an earlier end callback', async () => {
+    vi.useFakeTimers()
+    envState.mode = 'connected'
+    sendMessageToDifyMock.mockResolvedValueOnce({
+      answer: '{"face":"joy","text":"fallback playback"}',
+      conversation_id: 'conv-fallback',
+    })
+    let callbacks: { onStart?: () => void; onEnd?: () => void } | undefined
+    speakTextMock.mockImplementation((_text, _provider, nextCallbacks) => {
+      callbacks = nextCallbacks
+    })
+    const { result } = renderHook(() => useChatController())
+
+    try {
+      await act(async () => {
+        await result.current.handleSend('first')
+      })
+
+      act(() => {
+        callbacks?.onEnd?.()
+        vi.advanceTimersByTime(1000)
+        callbacks?.onStart?.()
+        vi.advanceTimersByTime(1000)
+      })
+
+      expect(result.current.status.isSpeaking).toBe(true)
+      expect(result.current.status.currentFace).toBe('joy')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it('does not speak when audio output is disallowed', async () => {
     envState.mode = 'connected'
     sendMessageToDifyMock.mockResolvedValueOnce({
