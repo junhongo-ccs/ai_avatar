@@ -354,4 +354,39 @@ describe('useChatController', () => {
 
     expect(stopSpeakingMock).toHaveBeenCalledTimes(1)
   })
+
+  it('keeps the response face visible until all staggered bubbles have appeared when audio is disallowed', async () => {
+    vi.useFakeTimers()
+    envState.mode = 'connected'
+    sendMessageToDifyMock.mockResolvedValueOnce({
+      answer: '{"face":"joy","messages":["1つ目","2つ目","3つ目"]}',
+      conversation_id: 'conv-mobile-multi',
+    })
+    const { result } = renderHook(() => useChatController({ audioOutputAllowed: false }))
+
+    try {
+      await act(async () => {
+        await result.current.handleSend('質問')
+      })
+
+      act(() => {
+        vi.advanceTimersByTime(2000)
+      })
+      expect(result.current.entries.filter((entry) => entry.role === 'assistant').map((entry) => entry.text))
+        .toEqual(['1つ目', '2つ目', '3つ目'])
+      expect(result.current.status.currentFace).toBe('joy')
+
+      act(() => {
+        vi.advanceTimersByTime(1499)
+      })
+      expect(result.current.status.currentFace).toBe('joy')
+
+      act(() => {
+        vi.advanceTimersByTime(1)
+      })
+      expect(result.current.status.currentFace).toBe('idle')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
 })

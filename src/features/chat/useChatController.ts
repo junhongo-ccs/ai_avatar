@@ -146,7 +146,7 @@ export const useChatController = ({ audioOutputAllowed = true }: UseChatControll
       connectionStatus: 'connected',
     }))
     if (!status.audioEnabled || !audioOutputAllowedRef.current) {
-      scheduleIdleFace(responseSequence, SILENT_FACE_HOLD_MS)
+      scheduleIdleFace(responseSequence, SILENT_FACE_HOLD_MS + remainingEntries.length * MESSAGE_BUBBLE_DELAY_MS)
       return
     }
 
@@ -177,7 +177,8 @@ export const useChatController = ({ audioOutputAllowed = true }: UseChatControll
   const setAudioEnabled = (enabled: boolean) => {
     if (!enabled) {
       stopSpeaking()
-      scheduleIdleFace(responseSequenceRef.current, SILENT_FACE_HOLD_MS)
+      const pendingBubbleDelayMs = pendingAssistantEntriesRef.current.length * MESSAGE_BUBBLE_DELAY_MS
+      scheduleIdleFace(responseSequenceRef.current, SILENT_FACE_HOLD_MS + pendingBubbleDelayMs)
     }
 
     setStatus((prev) => ({
