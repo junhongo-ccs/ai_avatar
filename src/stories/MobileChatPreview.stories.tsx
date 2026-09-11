@@ -65,10 +65,16 @@ const MobileChatPreview = () => {
       <header className="mb-3 flex h-[20%] shrink-0 items-center justify-between gap-[24px] rounded-2xl bg-[rgb(0_91_150)] px-3 py-2">
         <AvatarDisplay face={face} isSpeaking={false} compact />
         <h1 className="flex min-w-0 flex-1 items-center gap-2 text-xl font-bold text-white">
-          <span className="min-w-0 leading-tight">
-            <span className="block">CCS人事センパイに</span>
-            <span className="block">聞いてみよう</span>
-          </span>
+          <div className="min-w-0">
+            <span className="mb-4 block leading-tight">
+              <span className="block">CCS人事センパイに</span>
+              <span className="block">聞いてみよう</span>
+            </span>
+            <p className="text-xs font-normal leading-tight text-white">
+              ＊チャット内容はサービス改善のために記録されます。
+              個人情報や第三者の個人情報は入力しないでください。
+            </p>
+          </div>
         </h1>
       </header>
 

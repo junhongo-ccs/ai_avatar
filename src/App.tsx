@@ -14,7 +14,7 @@ export const App = () => {
     useChatController({ audioOutputAllowed: !isMobileViewport })
 
   return (
-    <main className="mx-auto flex h-dvh w-full max-w-[1600px] flex-col overflow-hidden px-3 py-3 md:min-h-dvh md:h-auto md:px-6 md:py-6 md:overflow-visible lg:h-dvh lg:overflow-hidden">
+    <main className="mx-auto flex h-dvh w-full max-w-[1600px] flex-col overflow-hidden px-3 py-3 md:min-h-dvh md:h-auto md:bg-[rgb(0_91_150)] md:px-6 md:py-6 md:overflow-visible lg:h-dvh lg:overflow-hidden">
       <header className="mb-3 flex h-[20dvh] shrink-0 items-center justify-between gap-[24px] md:mb-4 md:h-auto md:flex-row md:items-start">
         <div className="md:hidden">
           <AvatarDisplay face={status.currentFace} isSpeaking={status.isSpeaking} compact />
@@ -27,10 +27,16 @@ export const App = () => {
               aria-hidden="true"
               className="hidden h-8 w-8 shrink-0 translate-y-0.5 md:block md:h-12 md:w-12"
             />
-            <span className="min-w-0 leading-tight">
-              <span className="block md:inline">CCS人事センパイに</span>
-              <span className="block md:inline">聞いてみよう</span>
-            </span>
+            <div className="min-w-0">
+              <span className="mb-4 block leading-tight">
+                <span className="block md:inline">CCS人事センパイに</span>
+                <span className="block md:inline">聞いてみよう</span>
+              </span>
+              <p className="text-xs font-normal leading-tight text-white md:hidden">
+                ＊チャット内容はサービス改善のために記録されます。
+                個人情報や第三者の個人情報は入力しないでください。
+              </p>
+            </div>
           </h1>
         </div>
         <div className="hidden md:block">
@@ -42,6 +48,11 @@ export const App = () => {
         <aside className="hidden space-y-3 md:block lg:sticky lg:top-0 lg:min-h-0 lg:self-start lg:overflow-y-auto lg:pr-1">
           <AvatarDisplay face={status.currentFace} isSpeaking={status.isSpeaking} />
           <StatusBadge status={status} />
+          <p className="rounded-2xl bg-transparent text-xs leading-relaxed text-white shadow-none">
+            ＊チャット内容はサービス改善のために記録されます。
+            <br />
+            個人情報や第三者の個人情報は入力しないでください。
+          </p>
         </aside>
 
         <section className="flex min-h-0 min-w-0 flex-1 flex-col rounded-2xl border border-[rgb(87_121_160)] bg-white p-3 sm:p-4 md:block md:flex-none lg:flex lg:h-full lg:flex-1 lg:flex-col">
