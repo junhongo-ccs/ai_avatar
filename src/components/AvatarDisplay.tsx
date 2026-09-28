@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { FACE_LABELS, type DisplayFace } from '../types/avatar'
+import { FACE_LABELS, FACE_VALUES, type DisplayFace } from '../types/avatar'
 import { getAvatarImagePath } from '../utils/getAvatarImagePath'
 
 type AvatarDisplayProps = {
@@ -10,44 +10,63 @@ type AvatarDisplayProps = {
 
 const BLINK_INTERVAL_MS = 4500
 const BLINK_DURATION_MS = 180
+const FACE_FADE_MS = 500
+
+// Fetch every face up front so the first switch to a face does not wait on
+// the network. Keep references so the browser does not discard the images.
+const preloadedImages: HTMLImageElement[] = []
+const preloadAvatarImages = () => {
+  if (preloadedImages.length > 0 || typeof Image === 'undefined') {
+    return
+  }
+  const paths = [...FACE_VALUES, 'idle' as const].map((face) => getAvatarImagePath(face))
+  paths.push(getAvatarImagePath('idle', true))
+  paths.forEach((path) => {
+    const image = new Image()
+    image.src = path
+    preloadedImages.push(image)
+  })
+}
 
 export const AvatarDisplay = ({ face, isSpeaking, compact = false }: AvatarDisplayProps) => {
-  const [visibleFace, setVisibleFace] = useState(face)
-  const [previousFace, setPreviousFace] = useState<DisplayFace | undefined>(undefined)
-  const [isTransitioning, setIsTransitioning] = useState(false)
+  // baseFace stays fully opaque underneath. A new face is layered on top and
+  // only fades in once its image has loaded, so the avatar never goes blank
+  // while the next image is still downloading.
+  const [baseFace, setBaseFace] = useState(face)
+  const [incomingLoaded, setIncomingLoaded] = useState(false)
+  const [incomingVisible, setIncomingVisible] = useState(false)
   const [blinkActive, setBlinkActive] = useState(false)
-  const visibleFaceRef = useRef(face)
-  const transitionTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const incomingImageRef = useRef<HTMLImageElement>(null)
   const blinkTimerRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined)
   const blinkTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
+  const incomingFace = face !== baseFace ? face : undefined
+
+  useEffect(preloadAvatarImages, [])
+
   useEffect(() => {
-    if (face === visibleFaceRef.current) {
+    setIncomingLoaded(false)
+    setIncomingVisible(false)
+    if (incomingFace && incomingImageRef.current?.complete && incomingImageRef.current.naturalWidth > 0) {
+      setIncomingLoaded(true)
+    }
+  }, [incomingFace])
+
+  useEffect(() => {
+    if (!incomingFace || !incomingLoaded) {
       return
     }
 
-    if (transitionTimerRef.current) {
-      clearTimeout(transitionTimerRef.current)
-    }
-
-    setPreviousFace(visibleFaceRef.current)
-    visibleFaceRef.current = face
-    setVisibleFace(face)
-    setIsTransitioning(false)
-
-    const animationFrame = requestAnimationFrame(() => setIsTransitioning(true))
-    transitionTimerRef.current = setTimeout(() => {
-      setPreviousFace(undefined)
-      setIsTransitioning(false)
-    }, 500)
+    const animationFrame = requestAnimationFrame(() => setIncomingVisible(true))
+    const settleTimer = setTimeout(() => {
+      setBaseFace(incomingFace)
+    }, FACE_FADE_MS)
 
     return () => {
       cancelAnimationFrame(animationFrame)
-      if (transitionTimerRef.current) {
-        clearTimeout(transitionTimerRef.current)
-      }
+      clearTimeout(settleTimer)
     }
-  }, [face])
+  }, [incomingFace, incomingLoaded])
 
   useEffect(() => {
     if (face !== 'idle') {
@@ -91,34 +110,40 @@ export const AvatarDisplay = ({ face, isSpeaking, compact = false }: AvatarDispl
     isSpeaking ? 'animate-[pulse_3s_ease-in-out_infinite]' : ''
   }`
 
-  const currentImagePath =
-    face === 'idle' && blinkActive ? getAvatarImagePath(face, true) : getAvatarImagePath(face)
+  const baseImagePath =
+    baseFace === 'idle' && !incomingFace && blinkActive
+      ? getAvatarImagePath(baseFace, true)
+      : getAvatarImagePath(baseFace)
 
   return (
     <div className={compact ? 'shrink-0' : 'rounded-2xl border border-[rgb(87_121_160)] bg-sky-50 p-5 shadow-sm'}>
       <div className={`relative mx-auto w-fit rounded-2xl bg-[oklch(93.2%_0.032_255.585)] ${compact ? 'p-1' : 'p-2'}`}>
-        {previousFace ? (
+        <div className="relative">
           <img
-            src={getAvatarImagePath(previousFace)}
-            alt=""
-            aria-hidden="true"
-            className={`absolute ${imageClassName} ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}
+            src={baseImagePath}
+            alt={`avatar-${incomingFace ? face : baseFace}`}
+            className={`relative ${imageClassName}`}
+            onError={(event) => {
+              event.currentTarget.src = getAvatarImagePath('idle')
+            }}
           />
-        ) : null}
-        <img
-          src={currentImagePath}
-          alt={`avatar-${visibleFace}`}
-          className={`relative ${imageClassName} ${
-            previousFace && !isTransitioning ? 'opacity-0' : 'opacity-100'
-          }`}
-          onError={(event) => {
-            event.currentTarget.src = getAvatarImagePath('idle')
-          }}
-        />
+          {incomingFace ? (
+            <img
+              key={incomingFace}
+              ref={incomingImageRef}
+              src={getAvatarImagePath(incomingFace)}
+              alt=""
+              aria-hidden="true"
+              className={`absolute left-0 top-0 ${imageClassName} ${incomingVisible ? 'opacity-100' : 'opacity-0'}`}
+              onLoad={() => setIncomingLoaded(true)}
+              onError={() => setBaseFace(incomingFace)}
+            />
+          ) : null}
+        </div>
       </div>
       {!compact ? <div className="mt-3 flex flex-wrap items-center gap-2">
         <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-          face: {FACE_LABELS[visibleFace]}
+          face: {FACE_LABELS[face]}
         </span>
         <span
           className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
