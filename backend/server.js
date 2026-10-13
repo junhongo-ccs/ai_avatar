@@ -21,5 +21,5 @@ if (fs.existsSync(distDir)) {
 }
 
 app.listen(port, () => {
-  console.log(`VOICEVOX proxy listening on http://127.0.0.1:${port}`)
+  console.log(`API server listening on http://127.0.0.1:${port}`)
 })

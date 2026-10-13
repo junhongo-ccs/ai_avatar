@@ -12,11 +12,11 @@ services:
         value: browser
       - key: VITE_USE_MOCK
         value: "false"
-      - key: VITE_DIFY_API_URL
+      - key: DIFY_API_URL
         sync: false
-      - key: VITE_DIFY_API_KEY
+      - key: DIFY_API_KEY
         sync: false
-      - key: VITE_DIFY_USER_ID
+      - key: DIFY_USER_ID
         sync: false
       - key: BASIC_AUTH_USER
         sync: false

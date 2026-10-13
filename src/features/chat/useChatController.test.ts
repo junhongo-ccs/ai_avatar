@@ -2,25 +2,16 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const envState = {
-  mode: 'connected' as 'connected' | 'misconfigured',
-}
-
 const sendMessageToDifyMock = vi.fn()
 const speakTextMock = vi.fn()
 const stopSpeakingMock = vi.fn()
 
 vi.mock('../../config/env', () => ({
-  getDifyConfig: () => ({
-    apiUrl: 'https://api.dify.ai/v1',
-    apiKey: 'dummy',
-    userId: 'user-1',
-  }),
-  getDifyConnectionStatus: () => envState.mode,
   getTtsProvider: () => 'browser',
 }))
 
 vi.mock('../../services/difyClient', () => ({
+  DifyNotConfiguredError: class DifyNotConfiguredError extends Error {},
   sendMessageToDify: (...args: unknown[]) => sendMessageToDifyMock(...args),
 }))
 
@@ -29,6 +20,7 @@ vi.mock('../../services/speechService', () => ({
   stopSpeaking: () => stopSpeakingMock(),
 }))
 
+import { DifyNotConfiguredError } from '../../services/difyClient'
 import { useChatController } from './useChatController'
 
 beforeEach(() => {
@@ -39,7 +31,6 @@ beforeEach(() => {
 
 describe('useChatController', () => {
   it('prevents double send while loading', async () => {
-    envState.mode = 'connected'
     let resolveDify: ((value: { answer: string; conversation_id: string }) => void) | undefined
     sendMessageToDifyMock.mockImplementation(
       () =>
@@ -64,7 +55,6 @@ describe('useChatController', () => {
   })
 
   it('uses dify path and keeps conversation_id', async () => {
-    envState.mode = 'connected'
     sendMessageToDifyMock
       .mockResolvedValueOnce({ answer: '{"face":"joy","text":"one"}', conversation_id: 'conv-1' })
       .mockResolvedValueOnce({ answer: '{"face":"sad","text":"two"}', conversation_id: 'conv-1' })
@@ -83,22 +73,13 @@ describe('useChatController', () => {
       await result.current.handleSend('second')
     })
 
-    expect(sendMessageToDifyMock).toHaveBeenNthCalledWith(
-      1,
-      { message: 'first', conversationId: undefined },
-      expect.any(Object),
-    )
-    expect(sendMessageToDifyMock).toHaveBeenNthCalledWith(
-      2,
-      { message: 'second', conversationId: 'conv-1' },
-      expect.any(Object),
-    )
+    expect(sendMessageToDifyMock).toHaveBeenNthCalledWith(1, { message: 'first', conversationId: undefined })
+    expect(sendMessageToDifyMock).toHaveBeenNthCalledWith(2, { message: 'second', conversationId: 'conv-1' })
     expect(result.current.status.mode).toBe('dify')
     expect(result.current.status.connectionStatus).toBe('connected')
   })
 
   it('returns face to normal after a sad response when next answer is plain text', async () => {
-    envState.mode = 'connected'
     sendMessageToDifyMock
       .mockResolvedValueOnce({ answer: '{"face":"sad","text":"first"}', conversation_id: 'conv-1' })
       .mockResolvedValueOnce({ answer: 'タグなしの通常応答です', conversation_id: 'conv-1' })
@@ -119,7 +100,6 @@ describe('useChatController', () => {
   })
 
   it('returns to idle while waiting for the next response', async () => {
-    envState.mode = 'connected'
     sendMessageToDifyMock.mockResolvedValueOnce({
       answer: '{"face":"joy","text":"first"}',
       conversation_id: 'conv-1',
@@ -152,7 +132,6 @@ describe('useChatController', () => {
 
   it('adds Dify messages as separate assistant entries', async () => {
     vi.useFakeTimers()
-    envState.mode = 'connected'
     sendMessageToDifyMock.mockResolvedValueOnce({
       answer: '{"face":"normal","messages":["1つ目の回答","2つ目の回答"]}',
       conversation_id: 'conv-1',
@@ -178,7 +157,6 @@ describe('useChatController', () => {
 
   it('flushes delayed bubbles before sending the next question', async () => {
     vi.useFakeTimers()
-    envState.mode = 'connected'
     sendMessageToDifyMock
       .mockResolvedValueOnce({
         answer: '{"face":"normal","messages":["1つ目","2つ目","3つ目"]}',
@@ -209,8 +187,8 @@ describe('useChatController', () => {
     }
   })
 
-  it('misconfigured does not call API', async () => {
-    envState.mode = 'misconfigured'
+  it('sets misconfigured status when the server has no Dify settings', async () => {
+    sendMessageToDifyMock.mockRejectedValueOnce(new DifyNotConfiguredError())
 
     const { result } = renderHook(() => useChatController())
 
@@ -218,14 +196,13 @@ describe('useChatController', () => {
       await result.current.handleSend('test')
     })
 
-    expect(sendMessageToDifyMock).not.toHaveBeenCalled()
+    expect(result.current.status.isLoading).toBe(false)
     expect(result.current.status.mode).toBe('dify')
     expect(result.current.status.connectionStatus).toBe('misconfigured')
     expect(result.current.latestError).toContain('Dify設定が不足')
   })
 
   it('sets error status on dify API failure', async () => {
-    envState.mode = 'connected'
     sendMessageToDifyMock.mockRejectedValueOnce(new Error('network'))
 
     const { result } = renderHook(() => useChatController())
@@ -240,7 +217,6 @@ describe('useChatController', () => {
   })
 
   it('returns to sendable state after error', async () => {
-    envState.mode = 'connected'
     sendMessageToDifyMock
       .mockRejectedValueOnce(new Error('network'))
       .mockResolvedValueOnce({ answer: '{"face":"joy","text":"retry ok"}', conversation_id: 'conv-r' })
@@ -264,7 +240,6 @@ describe('useChatController', () => {
   })
 
   it('does not speak when audio is turned off', async () => {
-    envState.mode = 'connected'
     sendMessageToDifyMock.mockResolvedValueOnce({
       answer: '{"face":"joy","text":"audio off"}',
       conversation_id: 'conv-off',
@@ -285,7 +260,6 @@ describe('useChatController', () => {
   })
 
   it('stops current speech when audio is turned off', () => {
-    envState.mode = 'connected'
     const { result } = renderHook(() => useChatController())
 
     act(() => {
@@ -297,7 +271,6 @@ describe('useChatController', () => {
 
   it('keeps the response face while a browser fallback starts after an earlier end callback', async () => {
     vi.useFakeTimers()
-    envState.mode = 'connected'
     sendMessageToDifyMock.mockResolvedValueOnce({
       answer: '{"face":"joy","text":"fallback playback"}',
       conversation_id: 'conv-fallback',
@@ -328,7 +301,6 @@ describe('useChatController', () => {
   })
 
   it('does not speak when audio output is disallowed', async () => {
-    envState.mode = 'connected'
     sendMessageToDifyMock.mockResolvedValueOnce({
       answer: '{"face":"joy","text":"mobile silent"}',
       conversation_id: 'conv-mobile',
@@ -344,7 +316,6 @@ describe('useChatController', () => {
   })
 
   it('stops speech when audio output becomes disallowed', () => {
-    envState.mode = 'connected'
     const { rerender } = renderHook(
       ({ audioOutputAllowed }) => useChatController({ audioOutputAllowed }),
       { initialProps: { audioOutputAllowed: true } },
@@ -357,7 +328,6 @@ describe('useChatController', () => {
 
   it('keeps the response face visible until all staggered bubbles have appeared when audio is disallowed', async () => {
     vi.useFakeTimers()
-    envState.mode = 'connected'
     sendMessageToDifyMock.mockResolvedValueOnce({
       answer: '{"face":"joy","messages":["1つ目","2つ目","3つ目"]}',
       conversation_id: 'conv-mobile-multi',

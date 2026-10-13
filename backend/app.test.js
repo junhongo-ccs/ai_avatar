@@ -14,6 +14,62 @@ const makeBinaryResponse = (buffer, ok = true, status = 200) => ({
   arrayBuffer: async () => buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength),
 })
 
+describe('Dify chat proxy route', () => {
+  const difyOptions = {
+    difyApiUrl: 'https://dify.example.com/v1/',
+    difyApiKey: 'app-secret',
+    difyUserId: 'user-1',
+  }
+
+  it('forwards the message to Dify with the server-side API key', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(makeJsonResponse({ answer: '{"face":"joy","messages":["hi"]}', conversation_id: 'conv-1' }))
+    const app = createApp({ fetchImpl: fetchMock, ...difyOptions })
+
+    const response = await request(app).post('/api/chat').send({ message: ' hello ', conversationId: 'conv-0' })
+
+    expect(response.status).toBe(200)
+    expect(response.body.conversation_id).toBe('conv-1')
+    const [url, init] = fetchMock.mock.calls[0]
+    expect(url).toBe('https://dify.example.com/v1/chat-messages')
+    expect(init.headers.Authorization).toBe('Bearer app-secret')
+    expect(JSON.parse(init.body)).toEqual({
+      inputs: {},
+      query: 'hello',
+      response_mode: 'blocking',
+      conversation_id: 'conv-0',
+      user: 'user-1',
+    })
+  })
+
+  it('returns 503 when Dify is not configured', async () => {
+    const fetchMock = vi.fn()
+    const app = createApp({ fetchImpl: fetchMock, difyApiUrl: '', difyApiKey: '' })
+
+    const response = await request(app).post('/api/chat').send({ message: 'hello' })
+
+    expect(response.status).toBe(503)
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('returns 400 when message is missing', async () => {
+    const app = createApp({ fetchImpl: vi.fn(), ...difyOptions })
+    const response = await request(app).post('/api/chat').send({ message: '   ' })
+    expect(response.status).toBe(400)
+  })
+
+  it('returns 502 when Dify fails', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(makeJsonResponse({}, false, 401))
+    const app = createApp({ fetchImpl: fetchMock, ...difyOptions })
+
+    const response = await request(app).post('/api/chat').send({ message: 'hello' })
+
+    expect(response.status).toBe(502)
+    expect(JSON.stringify(response.body)).not.toContain('app-secret')
+  })
+})
+
 describe('VOICEVOX backend route', () => {
   it('requires basic auth when configured', async () => {
     const app = createApp({
