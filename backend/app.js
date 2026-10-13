@@ -104,12 +104,16 @@ export const createApp = ({
       })
 
       if (!difyResponse.ok) {
+        console.error(`[api/chat] Dify responded ${difyResponse.status}`)
         return res.status(502).json({ error: 'dify request failed', status: difyResponse.status })
       }
 
       return res.status(200).json(await difyResponse.json())
-    } catch {
-      return res.status(502).json({ error: 'dify request failed' })
+    } catch (error) {
+      // Node's fetch hides the network reason (DNS, refused, timeout, TLS) in error.cause.
+      const reason = error?.cause?.code ?? error?.cause?.message ?? error?.message ?? 'unknown'
+      console.error(`[api/chat] Dify request error: ${reason}`)
+      return res.status(502).json({ error: 'dify request failed', reason })
     }
   })
 
