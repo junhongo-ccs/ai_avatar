@@ -43,9 +43,6 @@ export const createApp = ({
   defaultSpeaker,
   basicAuthUser,
   basicAuthPassword,
-  difyApiUrl,
-  difyApiKey,
-  difyUserId,
 } = {}) => {
   const app = express()
   const authUser = basicAuthUser ?? process.env.BASIC_AUTH_USER ?? ''
@@ -67,55 +64,6 @@ export const createApp = ({
   }
 
   app.use(express.json())
-
-  // The Dify API key stays on the server: the browser only calls /api/chat,
-  // so the key never ships in the client bundle or request headers.
-  const difyUrl = (difyApiUrl ?? process.env.DIFY_API_URL ?? '').trim().replace(/\/$/, '')
-  const difyKey = (difyApiKey ?? process.env.DIFY_API_KEY ?? '').trim()
-  const difyUser = (difyUserId ?? process.env.DIFY_USER_ID ?? '').trim() || 'local-user-001'
-
-  app.post('/api/chat', async (req, res) => {
-    if (!difyUrl || !difyKey) {
-      return res.status(503).json({ error: 'dify is not configured' })
-    }
-
-    const message = typeof req.body?.message === 'string' ? req.body.message.trim() : ''
-    if (!message) {
-      return res.status(400).json({ error: 'message is required' })
-    }
-
-    const conversationId =
-      typeof req.body?.conversationId === 'string' && req.body.conversationId ? req.body.conversationId : undefined
-
-    try {
-      const difyResponse = await fetchImpl(`${difyUrl}/chat-messages`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${difyKey}`,
-        },
-        body: JSON.stringify({
-          inputs: {},
-          query: message,
-          response_mode: 'blocking',
-          conversation_id: conversationId,
-          user: difyUser,
-        }),
-      })
-
-      if (!difyResponse.ok) {
-        console.error(`[api/chat] Dify responded ${difyResponse.status}`)
-        return res.status(502).json({ error: 'dify request failed', status: difyResponse.status })
-      }
-
-      return res.status(200).json(await difyResponse.json())
-    } catch (error) {
-      // Node's fetch hides the network reason (DNS, refused, timeout, TLS) in error.cause.
-      const reason = error?.cause?.code ?? error?.cause?.message ?? error?.message ?? 'unknown'
-      console.error(`[api/chat] Dify request error: ${reason}`)
-      return res.status(502).json({ error: 'dify request failed', reason })
-    }
-  })
 
   const vvEngineUrl = (engineUrl ?? process.env.VOICEVOX_ENGINE_URL ?? 'http://127.0.0.1:50021').replace(/\/$/, '')
   const vvDefaultSpeaker = parseSpeaker(defaultSpeaker ?? process.env.VOICEVOX_SPEAKER, 1)

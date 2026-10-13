@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { adaptDifyResponse } from '../../adapters/difyResponseAdapter'
-import { getTtsProvider } from '../../config/env'
-import { DifyNotConfiguredError, sendMessageToDify } from '../../services/difyClient'
+import { getDifyConfig, getDifyConnectionStatus, getTtsProvider } from '../../config/env'
+import { sendMessageToDify } from '../../services/difyClient'
 import { speakText, stopSpeaking } from '../../services/speechService'
 import type { Face } from '../../types/avatar'
 import type { ChatEntry } from '../../types/chat'
@@ -12,27 +12,33 @@ const SPOKEN_FACE_HOLD_MS = 1500
 const SILENT_FACE_HOLD_MS = 1500
 const MESSAGE_BUBBLE_DELAY_MS = 1000
 
-const INITIAL_MESSAGE =
-  'こんにちは。会社のことや働き方、選考について気になることがあれば、お気軽に聞いてください。\n\nこんな内容ならお答えできます。\n- 選考・イベントについて\n- 勤務地・在宅勤務などの働き方について\n- 配属・新人研修について\n- 残業時間・福利厚生について'
+const initialMessageByConnectionStatus = {
+  connected:
+    'こんにちは。会社のことや働き方、選考について気になることがあれば、お気軽に聞いてください。\n\nこんな内容ならお答えできます。\n- 選考・イベントについて\n- 勤務地・在宅勤務などの働き方について\n- 配属・新人研修について\n- 残業時間・福利厚生について',
+  misconfigured: 'Dify設定が不足しています。.env を確認してください。',
+  error: '通信エラーが発生しています。再送信を試してください。',
+} as const
 
 type UseChatControllerOptions = {
   audioOutputAllowed?: boolean
 }
 
 export const useChatController = ({ audioOutputAllowed = true }: UseChatControllerOptions = {}) => {
+  const config = getDifyConfig()
+  const envConnectionStatus = getDifyConnectionStatus(config)
   const ttsProvider = getTtsProvider()
 
   const [entries, setEntries] = useState<ChatEntry[]>([
     {
       id: createId(),
       role: 'system',
-      text: INITIAL_MESSAGE,
+      text: initialMessageByConnectionStatus[envConnectionStatus],
       timestamp: Date.now(),
     },
   ])
   const [status, setStatus] = useState<AppStatus>({
     mode: 'dify',
-    connectionStatus: 'connected',
+    connectionStatus: envConnectionStatus,
     ttsProvider,
     audioEnabled: true,
     isLoading: false,
@@ -212,26 +218,26 @@ export const useChatController = ({ audioOutputAllowed = true }: UseChatControll
       currentFace: 'idle',
     }))
 
+    if (status.connectionStatus === 'misconfigured') {
+      setLoading(false)
+      setStatus((prev) => ({
+        ...prev,
+        errorMessage: 'Dify設定が不足しています。.env の VITE_DIFY_* を確認してください。',
+        connectionStatus: 'misconfigured',
+        currentFace: 'idle',
+      }))
+      return
+    }
+
     try {
-      const raw = await sendMessageToDify({ message: value, conversationId })
+      const raw = await sendMessageToDify({ message: value, conversationId }, config)
       const adapted = adaptDifyResponse(raw)
       if (adapted.conversationId) {
         setConversationId(adapted.conversationId)
       }
       pushAssistantResponse(adapted.avatar.messages, adapted.avatar.face)
-    } catch (error) {
+    } catch {
       setLoading(false)
-      if (error instanceof DifyNotConfiguredError) {
-        setStatus((prev) => ({
-          ...prev,
-          connectionStatus: 'misconfigured',
-          isSpeaking: false,
-          currentFace: 'idle',
-          errorMessage: 'Dify設定が不足しています。サーバーの DIFY_API_URL / DIFY_API_KEY を確認してください。',
-        }))
-        return
-      }
-
       setStatus((prev) => ({
         ...prev,
         connectionStatus: 'error',

@@ -63,14 +63,20 @@ Dify 1.0以降は、OpenAIなどのモデルプロバイダーもプラグイン
 
 アプリを公開し、「APIアクセス」で新しいAPIキーを発行します。
 
-| 変数 | ローカル（`backend/.env`） | Render |
+| 変数 | ローカル（`.env`） | Render |
 |---|---|---|
-| `DIFY_API_KEY` | 新しいキーに変更 | 新しいキーに変更 |
-| `DIFY_API_URL` | `https://dify.solccs.net/v1` | 同左 |
+| `VITE_DIFY_API_KEY` | 新しいキーに変更 | 新しいキーに変更 |
+| `VITE_DIFY_API_URL` | Dify Cloudなら `https://api.dify.ai/v1` のまま。自前ホストならそのURL | 同左 |
 
-APIキーはサーバー側だけに置きます。ブラウザは自前サーバーの `/api/chat` を呼び、サーバーがキーを付けてDifyへ中継します。`VITE_` を付けた変数はビルド時に画面のJavaScriptへ埋め込まれて誰でも見られるので、キーには使いません。
+`VITE_` で始まる変数はビルド時に埋め込まれます。Renderで変更したあとは、再ビルド・再デプロイが必要です。
 
-社内Difyの「APIアクセス」画面ではベースURLが `http://` と表示されますが、`https://` が正しい入口です（httpはhttpsへ転送される）。
+注意：この方式では、APIキーが公開されるJavaScriptに含まれ、ブラウザから見えます。会社のアカウントのキーになるので、扱いに問題がないか確認してください。
+
+### サーバー中継への切り替え（保留中）
+
+キーを隠すため、Renderのサーバーの `/api/chat` からDifyを呼ぶ形に一度切り替えました（コミット `3e64898`、`37ff458`）。しかし、社内DifyのSSL証明書に中間証明書が含まれておらず、Node.jsから接続すると `UNABLE_TO_VERIFY_LEAF_SIGNATURE` で失敗したため、2026-10-13に元に戻しています。ブラウザは足りない中間証明書を自動で補うので、ブラウザから直接呼ぶ今の形では問題が出ません。
+
+社内Difyの管理者にnginxの `ssl_certificate` をフルチェーン（中間証明書込み）にしてもらえたら、2つのコミットを戻し直せば（`git revert` の取り消し）サーバー中継に切り替えられます。そのときはRenderの環境変数を `DIFY_API_URL` / `DIFY_API_KEY` / `DIFY_USER_ID` にします。`NODE_TLS_REJECT_UNAUTHORIZED=0` で証明書の確認を止める方法は使わないでください。
 
 ## 6. 動作確認
 

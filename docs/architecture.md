@@ -12,7 +12,7 @@ This PoC verifies a conversational AI avatar pipeline:
 ## Runtime Modes
 
 - `dify`: Calls Dify `/chat-messages`
-- `misconfigured`: the server has no `DIFY_API_URL` / `DIFY_API_KEY` (`/api/chat` returns 503)
+- `misconfigured`: Dify mode requested but required env settings are missing
 - `error`: Dify request failed; user can retry
 
 ## Key Components
@@ -39,7 +39,6 @@ Render公開版は以下の構成で動作します:
 
 - Render Web Service (Node)
   - `dist` を静的配信
-  - `/api/chat` でDifyへ中継（DifyのAPIキーはサーバーの環境変数 `DIFY_API_KEY` だけが持つ）
   - `/api/tts/voicevox` エンドポイントを保持（公開版では通常未使用）
 - Dify API
   - 会話応答を生成

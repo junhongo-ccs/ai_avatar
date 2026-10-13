@@ -49,20 +49,17 @@ Example expected answer:
 {"face":"joy","text":"こんにちは！はい、元気です。あなたはどうですか？"}
 ```
 
-## 6. Server env
+## 6. Frontend env
 
-The browser calls the backend `/api/chat`, and the backend forwards to Dify with the API key.
-Set `backend/.env` (locally) or the Render environment variables:
+Set `.env`:
 
 ```env
-DIFY_API_URL=https://dify.solccs.net/v1
-DIFY_API_KEY=***
-DIFY_USER_ID=local-user-001
+VITE_DIFY_API_URL=https://api.dify.ai/v1
+VITE_DIFY_API_KEY=***
+VITE_DIFY_USER_ID=local-user-001
 ```
-
-Do not prefix the key with `VITE_`: Vite embeds `VITE_*` values into the public JavaScript bundle.
 
 ## 7. Notes
 
-- If the server env is incomplete, `/api/chat` returns 503 and the app shows `misconfigured`.
+- If env is incomplete, app should remain in `misconfigured`.
 - Adapter must normalize Dify raw response before UI.

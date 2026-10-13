@@ -64,8 +64,7 @@
 
 Difyの生レスポンスをそのまま画面で扱わず、いったん `AvatarResponse` に正規化しています。
 
-- ブラウザ → 自前サーバーの `POST /api/chat` → Dify API `POST /chat-messages`
-- DifyのAPIキーはサーバー側（`backend/app.js`）だけが持ち、ブラウザには渡しません
+- Dify API: `POST /chat-messages`
 - 応答の想定形式（複数吹き出し用）:
 
 ```json
@@ -88,8 +87,7 @@ Difyの生レスポンスをそのまま画面で扱わず、いったん `Avata
 
 主な実装:
 
-- `src/services/difyClient.ts`: サーバーの `/api/chat` との通信
-- `backend/app.js`: `/api/chat` でDifyへ中継（APIキーを付与）
+- `src/services/difyClient.ts`: Difyとの通信
 - `src/adapters/difyResponseAdapter.ts`: rawレスポンスを `AvatarResponse` へ変換
 - `src/utils/parseAvatarResponse.ts`: JSONまたはタグ付きテキストを解析
 - `src/utils/extractFaceTag.ts`: `[face:xxx]` を抽出
@@ -200,38 +198,29 @@ RAG用資料を、学生が知りやすい論点に寄せて整理していま�
 npm install
 ```
 
-2. 環境変数ファイルを作成
+2. `.env` を作成
 
 ```bash
 cp .env.example .env
-cp backend/.env.example backend/.env
 ```
 
-`.env`（ブラウザ側。ここに秘密情報は書かない）:
+例:
 
 ```env
+VITE_DIFY_API_URL=https://api.dify.ai/v1
+VITE_DIFY_API_KEY=
+VITE_DIFY_USER_ID=local-user-001
 VITE_TTS_PROVIDER=browser
 ```
-
-`backend/.env`（サーバー側。DifyのAPIキーはここだけに書く）:
-
-```env
-DIFY_API_URL=https://dify.solccs.net/v1
-DIFY_API_KEY=
-DIFY_USER_ID=local-user-001
-```
-
-`VITE_` で始まる変数はビルド時に画面のJavaScriptへ埋め込まれ、誰でも見られます。APIキーには `VITE_` を付けないでください。
 
 `VITE_TTS_PROVIDER`:
 
 - `browser`: Browser SpeechSynthesis
 
-3. 開発サーバ起動（2つのターミナルで）
+3. 開発サーバ起動
 
 ```bash
-npm run dev:backend   # /api/chat（Dify中継）を 8787 で起動
-npm run dev           # 画面。/api は 8787 へプロキシされる
+npm run dev
 ```
 
 ## Render公開
@@ -252,9 +241,9 @@ Render公開版では Browser TTS を使用します。
 設定項目:
 
 - `VITE_TTS_PROVIDER=browser`
-- `DIFY_API_URL`（例：`https://dify.solccs.net/v1`）
-- `DIFY_API_KEY`
-- `DIFY_USER_ID`
+- `VITE_DIFY_API_URL`
+- `VITE_DIFY_API_KEY`
+- `VITE_DIFY_USER_ID`
 - 必要なら `BASIC_AUTH_USER`
 - 必要なら `BASIC_AUTH_PASSWORD`
 

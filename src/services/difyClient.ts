@@ -1,33 +1,28 @@
+import type { DifyConfig } from '../types/config'
+
 export type DifyChatRequest = {
   message: string
   conversationId?: string
 }
 
-// The server answers 503 when DIFY_API_URL / DIFY_API_KEY are not set.
-export class DifyNotConfiguredError extends Error {
-  constructor() {
-    super('Dify is not configured on the server')
-    this.name = 'DifyNotConfiguredError'
-  }
-}
-
-// Calls the backend proxy instead of Dify directly, so the Dify API key
-// stays on the server and never reaches the browser.
-export const sendMessageToDify = async (request: DifyChatRequest): Promise<unknown> => {
-  const response = await fetch('/api/chat', {
+export const sendMessageToDify = async (
+  request: DifyChatRequest,
+  config: DifyConfig,
+): Promise<unknown> => {
+  const response = await fetch(`${config.apiUrl.replace(/\/$/, '')}/chat-messages`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${config.apiKey}`,
     },
     body: JSON.stringify({
-      message: request.message,
-      conversationId: request.conversationId,
+      inputs: {},
+      query: request.message,
+      response_mode: 'blocking',
+      conversation_id: request.conversationId,
+      user: config.userId,
     }),
   })
-
-  if (response.status === 503) {
-    throw new DifyNotConfiguredError()
-  }
 
   if (!response.ok) {
     throw new Error(`Dify request failed: ${response.status}`)
