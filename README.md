@@ -34,17 +34,16 @@
 
 回答の中核はDifyです。Dify側で採用ナレッジと回答ルールを持ち、フロントエンドはその応答を受け取って体験に変換します。
 
-- 採用ナレッジは `docs/rag/recruit_ccs_refined` に整理
+- 採用ナレッジは `docs/dify/rag/recruit_ccs_refined` に整理
 - 会社概要、募集条件、選考導線、待遇、働き方、研修、福利厚生、採用実績などを対象化
 - 回答ルールでは、ナレッジに明記された事実を優先し、未記載事項は推測しない方針
 - 採用・新卒に関する質問は採用ナレッジを優先し、技術・ソリューション系は別ナレッジを優先する運用
 
 関連資料:
 
-- `docs/rag/recruit_ccs_refined/01_overview.md`
-- `docs/rag/recruit_ccs_refined/03_current_spec.md`
-- `docs/rag/recruit_ccs_refined/04_decision_rules.md`
-- `docs/rag/recruit_ccs_refined/05_faq.md`
+- `docs/dify/rag/README.md`（Difyのナレッジとファイルの対応）
+- `docs/dify/rag/recruit_ccs_refined/00_QA_0928.md`
+- `docs/dify/rag/recruit_ccs_refined/01_overview.md`
 
 この構成により、採用イベントで重要な `正確さ` と `答え方の一貫性` を担保しやすくしています。
 
@@ -256,7 +255,7 @@ Render公開版では Browser TTS を使用します。
 
 ## Dify設定
 
-最小構成は `docs/dify-setup.md` を参照してください。
+最小構成は `docs/dify/setup.md` を参照してください。
 
 要点:
 
@@ -275,7 +274,8 @@ npm run build
 ## 関連ドキュメント
 
 - `docs/architecture.md`
-- `docs/dify-setup.md`
+- `docs/dify/setup.md`
+- `docs/dify/README.md`（Dify関連資料の目次。引っ越し手順・プロンプト・ナレッジ）
 - `docs/demo-script.md`
 - `specs/001-dify-poc/spec.md`
 - `specs/001-dify-poc/tasks.md`

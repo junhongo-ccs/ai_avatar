@@ -11,7 +11,7 @@ $targets = @(
   @{ id='08_mynavi_employment'; category='mynavi_employment'; title='Mynavi employment'; url='https://job.mynavi.jp/27/pc/corpinfo/displayEmployment/index?corpId=73343&recruitingCourseId=27024568' }
 )
 
-$outDir = Join-Path (Resolve-Path '.').Path 'docs/rag/recruit_ccs'
+$outDir = Join-Path (Resolve-Path '.').Path 'docs/dify/rag/archive/recruit_ccs'
 New-Item -ItemType Directory -Path $outDir -Force | Out-Null
 
 Add-Type -AssemblyName System.Web

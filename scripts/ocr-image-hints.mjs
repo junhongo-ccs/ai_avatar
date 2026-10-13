@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { createWorker } from 'tesseract.js';
 
-const targetDir = path.resolve('docs/rag/recruit_ccs');
+const targetDir = path.resolve('docs/dify/rag/archive/recruit_ccs');
 const maxPerFile = 8;
 
 function getFrontmatterSource(md) {

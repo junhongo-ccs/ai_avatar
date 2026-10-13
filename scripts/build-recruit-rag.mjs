@@ -13,7 +13,7 @@ const targets = [
   { id: '08_mynavi_employment', category: '募集要項（雇用条件）', title: 'マイナビ 雇用条件', url: 'https://job.mynavi.jp/27/pc/corpinfo/displayEmployment/index?corpId=73343&recruitingCourseId=27024568' }
 ];
 
-const outputDir = path.resolve('docs/rag/recruit_ccs');
+const outputDir = path.resolve('docs/dify/rag/archive/recruit_ccs');
 
 const normalizeText = (input) => input
   .replace(/\u00A0/g, ' ')

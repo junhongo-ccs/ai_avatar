@@ -3,8 +3,8 @@ import path from 'node:path';
 import { chromium } from 'playwright';
 import { createWorker } from 'tesseract.js';
 
-const targetDir = path.resolve('docs/rag/recruit_ccs');
-const shotDir = path.resolve('docs/rag/recruit_ccs/screenshots');
+const targetDir = path.resolve('docs/dify/rag/archive/recruit_ccs');
+const shotDir = path.resolve('docs/dify/rag/archive/recruit_ccs/screenshots');
 
 function getSourceUrl(md) {
   const m = md.match(/source_url:\s*(.+)/);

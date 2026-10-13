@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-const targetDir = path.resolve('docs/rag/recruit_ccs');
+const targetDir = path.resolve('docs/dify/rag/archive/recruit_ccs');
 const minLen = 280;
 const maxLen = 480;
 const maxChunks = 24;

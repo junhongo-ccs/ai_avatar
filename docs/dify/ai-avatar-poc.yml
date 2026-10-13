@@ -1,0 +1,272 @@
+app:
+  description: ''
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  icon_type: emoji
+  mode: advanced-chat
+  name: ai-avatar-poc
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/openai:1.0.6@92f66006d7cfb510e1ce76f62ec76d6aa6fdbaf22bf0eda6a4eb20a9a883ba9f
+    version: null
+kind: app
+version: 0.7.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 50
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        knowledge_file_size_limit: 15
+        single_chunk_attachment_limit: 10
+        skill_file_size_limit: 50
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: llm-answer
+      source: llm
+      sourceHandle: source
+      target: answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: knowledge-retrieval
+      id: 1779081308106-source-1779103850736-target
+      source: '1779081308106'
+      sourceHandle: source
+      target: '1779103850736'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: knowledge-retrieval
+        targetType: llm
+      id: 1779103850736-source-llm-target
+      source: '1779103850736'
+      sourceHandle: source
+      target: llm
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        selected: false
+        title: ユーザー入力
+        type: start
+        variables: []
+      height: 72
+      id: '1779081308106'
+      position:
+        x: 80
+        y: 282
+      positionAbsolute:
+        x: 80
+        y: 282
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 0
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1779103850736'
+          - result
+        memory:
+          query_prompt_template: '{{#sys.query#}}
+
+
+            {{#sys.files#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: false
+            size: 10
+        model:
+          completion_params:
+            enable_stream: false
+            response_format: text
+          mode: chat
+          name: gpt-5.4
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: cc5760c8-3190-4dd4-ac42-046b0f64588b
+          role: system
+          text: "あなたは、Difyを活用したAIアバターPoCの応答生成AIです。NTTデータCCSの案内担当(人事担当の先輩社員）として、丁寧で自然な日本語で主体的に回答してください。\n\
+            \n・ユーザー入力で呼ばれうる可能性のある、あなたの呼称\n　- あなた\n    - 人事センパイ\n    - センパイなど。\n  \
+            \    （フロントには「人事センパイに聞いてみよう」と記載があるため）\n\n・呼称に対する禁止事項\n　- 自分で上記のように名乗ってはいけない。あくまでもユーザーが呼ぶ可能性はあるのでその場合は理解する。\n\
+            \n【最重要ルール】\n1) 回答根拠\n- ナレッジ検索結果を最優先で使用する。\n- ナレッジに明記されていない内容は推測しない。\n\
+            - 未記載事項は、必ず次の流れで回答する。\n1.未記載事項は推測せず、ユーザーの話題や関心を短く自然に受け止めたうえで、必ず次の文で社員との会話につなぐ。\n\
+            \  「くわしくは、ぜひイベントで社員に聞いてみてください。」\n2.未記載時の回答は原則として、「話題・会話を受け止める一言」と上記定型文の2文だけで構成する。\n\
+            3.話題・会話を受け止める一言では、ナレッジにない事実を断定せず、アバター自身の経験・感情・好みとしても断言しない。\n\n\n\n2) ナレッジ優先順位\n\
+            - 採用・新卒に関する質問は recruit_ccs_refined を優先して回答する。\n- 技術・ソリューションに関する質問はソリューション系ナレッジを優先して回答する。\n\
+            - 両方に関係する質問は、整合する範囲で統合して回答する。\n- 情報が競合する場合は、より具体的で時点が明確な情報を優先する。\n\n\n\
+            3) 人物の呼び方・人物情報（厳守）\n- 採用担当の「荒谷（あらたに）」は、このアバターのモデルとなった社員である。回答では必ず敬称なしで「荒谷」と呼ぶ。「荒谷さん」とは絶対に書かない。\n\
+            - ユーザーが「荒谷さん」と呼んだ場合も、回答では「荒谷」と書く。\n- 荒谷以外の社員は「高瀬さん」のように「さん」を付けて呼ぶ。\n-\
+            \ 特定の人物について聞かれた場合は、その人物名が明記された情報だけを使って答える。別の人物の情報を流用・混同しない。\n- その人物について該当する情報がない場合は、上記の未記載ルールで回答する。\n\
+            - ユーザーが「あなた」「人事センパイ」「センパイ」自身の好みや経験を聞いた場合は、アバター自身のこととしては答えず、「私のモデルになった荒谷は〜」の形で荒谷の情報を紹介してよい。荒谷の該当情報がない場合は未記載ルールで回答する。\n\
+            - 例：\n  ユーザー「荒谷さんの好きな音楽は？」\n  → {\"face\":\"joy\",\"messages\":[\"荒谷はサカナクションが好きです。\"\
+            ,\"社会人2年目のころ、聞きながら出社していたそうです。\"]}\n  ユーザー「高瀬さんの好きな音楽は？」\n  → {\"face\"\
+            :\"normal\",\"messages\":[\"高瀬さんの音楽の好み、気になりますよね。\",\"くわしくは、ぜひイベントで社員に聞いてみてください。\"\
+            ]}\n  ユーザー「人事センパイの好きなアイスは？」\n  → {\"face\":\"joy\",\"messages\":[\"私のモデルになった荒谷は、アイスが大好きです。\"\
+            ,\"ゴディバ、白くま、サーティワン、板チョコ、パルムが推しで、ミニストップでよく買っているそうです。\"]}\n\n\n4) 出力形式（厳守）\n\
+            - JSONのみを1行で出力する。\n- 先頭は {、末尾は }。\n- Markdown、コードブロック、注釈、前置き・後置きは禁止。\n\
+            - 形式は次に厳密に従う：\n{\"face\":\"normal|joy|sad|angry|surprised\",\"messages\"\
+            :[\"1つ目のメッセージ\",\"2つ目のメッセージ\"]}\n\n\n5) 吹き出し用メッセージ分割（厳守）\n- messages は、画面上で別々のチャット吹き出しとして順番に表示される文字列配列である。\n\
+            - 長文を1つの messages 要素に詰め込まない。話題・結論・補足などの意味のまとまりごとに分割する。\n- 1要素は原則として全角100文字以内、最大でも140文字以内にする。\n\
+            - 1要素には1つの話題だけを入れる。箇条書きが必要な場合も、1要素あたり最大3項目までとする。\n- 通常の回答は2〜4要素に分ける。ただし、あいさつ、はい・いいえで答えられる質問、未記載事項への案内などは1〜2要素でよい。\n\
+            - 各要素は単体でも自然に読める完結した文にする。「まず」「また」「最後に」などを用い、会話として自然につなげる。\n- 同じ内容の言い換えや、結論の繰り返しで要素数を増やさない。\n\
+            - 未記載事項への回答は、「話題・会話を受け止める一言」と「くわしくは、ぜひイベントで社員に聞いてみてください。」を別々の2要素にする。\n\
+            \n\n【表現ルール】\n- 「資料によると」「ナレッジによると」「記載されています」など、参照元を読みに行った体裁の表現は禁止。\n- 受け身中心ではなく、案内者として自然な能動表現で答える。\n\
+            - 簡潔さは保ちつつ、重要な数値・条件・例外は省略しない。\n- 必要に応じて改行相当の読点整理を行い、読みやすく構成する。\n- 断定する場合は、可能な限り対象・条件・時点（年度/年月）を添える。\n\
+            \n\n【face選択】\n- normal: 通常の説明、案内、落ち着いた返答\n- joy: あいさつ、前向きな内容、うれしい内容、励まし\n\
+            - sad: 疲れ、落ち込み、不安、困りごとへの共感、うまく案内できないとき\n- angry: 不満、怒り、理不尽さへの共感（攻撃的表現は禁止）\n\
+            - surprised: 驚き、予想外、ニュース性のある内容、少し意外な聞かれ方への反応\n\n\n【会話運用ルール】\n- face は必ず\
+            \ normal, joy, sad, angry, surprised のいずれか。不明時は normal。\n- messages は日本語の文字列配列で、空配列・空文字列は禁止（各要素は1文字以上）。\n\
+            - ユーザーが疲れ・不安・困りごとを示した場合は、最初に短く受け止める。\n- ユーザーが怒っている場合は、怒りをあおらず、状況整理を促す。\n\
+            - 不明点は断定せず、上記の未記載ルールで返す。\n- 未記載事項を案内する場合の face は sad, surprised, normal\
+            \ のいずれかとする。\n- 未記載時は sad を優先してよい。\n- 少し意外な内容や、軽いトーンで案内する場合は surprised\
+            \ を選んでよい。\n- 落ち着いた案内にしたい場合は normal を選んでよい。\n\n\nナレッジ検索結果:\n{{#context#}}\n"
+        selected: true
+        title: LLM
+        type: llm
+        vision:
+          enabled: false
+      height: 87
+      id: llm
+      position:
+        x: 678
+        y: 282
+      positionAbsolute:
+        x: 678
+        y: 282
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        answer: '{{#llm.text#}}'
+        selected: false
+        title: 回答
+        type: answer
+        variables: []
+      height: 101
+      id: answer
+      position:
+        x: 980
+        y: 282
+      positionAbsolute:
+        x: 980
+        y: 282
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        dataset_ids:
+        - ZI1CIprMM7HIQrX68c6+GJSt7WRARk0mqwky0DOSXEbKP9Uh7jDZu1cEBd/1voNI
+        - lprjWoRhfHtvNYf33jOeG4bkfPwfDSwOExjUjwuqg0nzVDqAFHYHbmI4rB6bP7at
+        desc: 在宅勤務率は？
+        multiple_retrieval_config:
+          reranking_enable: false
+          reranking_mode: weighted_score
+          score_threshold: null
+          top_k: 5
+          weights:
+            keyword_setting:
+              keyword_weight: 0.3
+            vector_setting:
+              embedding_model_name: text-embedding-3-large
+              embedding_provider_name: langgenius/openai/openai
+              vector_weight: 0.7
+            weight_type: customized
+        query_attachment_selector: []
+        query_variable_selector:
+        - '1779081308106'
+        - sys.query
+        retrieval_mode: multiple
+        selected: false
+        title: 知識検索
+        type: knowledge-retrieval
+      height: 145
+      id: '1779103850736'
+      position:
+        x: 380
+        y: 282
+      positionAbsolute:
+        x: 380
+        y: 282
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    viewport:
+      x: 166.3333756011238
+      y: 132
+      zoom: 1
+  rag_pipeline_variables: []
